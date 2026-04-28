@@ -25,21 +25,22 @@ export default function ProfileSettingsPage() {
   if (!user) return null;
 
   async function handleSaveProfile() {
-    if (!name.trim()) {
-      toast.error("Name is required");
-      return;
-    }
-
-    if (!phone.trim()) {
-      toast.error("Phone number is required");
-      return;
-    }
+    if (!name.trim()) { toast.error("Name is required"); return; }
+    if (!phone.trim()) { toast.error("Phone number is required"); return; }
 
     setSaving(true);
     try {
-      // Mock update: persist to local user store.
-      setUser({ ...user, name: name.trim(), phone: phone.trim() });
+      const res = await fetch(`/api/profile/${user!.user_id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), phone: phone.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok) { toast.error(json.error ?? "Failed to save"); return; }
+      setUser({ ...user!, ...json.data });
       toast.success("Settings saved");
+    } catch {
+      toast.error("Network error");
     } finally {
       setSaving(false);
     }
@@ -137,7 +138,7 @@ export default function ProfileSettingsPage() {
           <ShieldCheck size={18} className="text-[#B42318]" />
           <h2 className="font-syne text-xl font-bold text-[#7A271A]">Security</h2>
         </div>
-        <p className="text-sm text-[#7A271A]">For now this demo uses mock authentication. Password reset can be wired to real auth provider next.</p>
+        <p className="text-sm text-[#7A271A]">Password reset can be wired to a real auth provider.</p>
         <button
           onClick={() => toast("Security actions will be enabled with backend auth integration.")}
           className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#E9AFAF] bg-white px-4 py-2 text-sm font-semibold text-[#7A271A] hover:bg-[#FFF1F1]"

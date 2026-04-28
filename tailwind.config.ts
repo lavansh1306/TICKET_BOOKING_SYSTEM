@@ -35,6 +35,9 @@ const config: Config = {
         shimmer: "shimmer 2s linear infinite",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
         draw: "draw 2s ease forwards",
+        "fade-in-up": "fade-in-up 0.6s ease-out forwards",
+        "scale-in": "scale-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+        "slide-in-right": "slide-in-right 0.5s ease-out forwards",
       },
       keyframes: {
         float: {
@@ -56,6 +59,18 @@ const config: Config = {
         draw: {
           from: { strokeDashoffset: "1" },
           to: { strokeDashoffset: "0" },
+        },
+        "fade-in-up": {
+          from: { opacity: "0", transform: "translateY(20px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "scale-in": {
+          from: { opacity: "0", transform: "scale(0.92)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        "slide-in-right": {
+          from: { opacity: "0", transform: "translateX(-30px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
         },
       },
     },

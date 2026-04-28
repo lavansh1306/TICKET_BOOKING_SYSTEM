@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   }
 
   const { user_id, event_id, seat_ids, amount, payment_method } = parsed.data;
-  const booking_date = parsed.data.booking_date ?? new Date().toISOString();
+  const booking_date = parsed.data.booking_date ?? new Date().toISOString().slice(0, 10);
   const connection = await db.getConnection();
 
   try {
