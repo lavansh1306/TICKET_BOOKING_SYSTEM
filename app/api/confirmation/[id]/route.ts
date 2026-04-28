@@ -154,8 +154,8 @@ export async function GET(
       const seatIds = tickets.map((t) => t.seat_id);
       const placeholders = seatIds.map(() => "?").join(",");
       const [seatResults] = await db.query<SeatRow[]>(
-        `SELECT seat_id, seat_number FROM Seat WHERE seat_id IN (${placeholders}) AND event_id = ?`,
-        [...seatIds, booking.event_id]
+        `SELECT seat_id, seat_number FROM Seat WHERE seat_id IN (${placeholders})`,
+        [...seatIds]
       );
       seats = seatResults;
     }
