@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import gsap from "gsap";
 import { ChevronRight, MapPin, Calendar, Users, Share2, Copy, Star, Phone } from "lucide-react";
 import { z } from "zod";
 import Badge from "@/components/ui/Badge";
@@ -146,43 +147,60 @@ export default function EventDetailClient({ event }: { event: EventData }) {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  // Category → placeholder image colour
   const bannerSeed = event_id * 37;
+  const bannerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: bannerRef, offset: ["start start", "end start"] });
+  const bannerY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const bannerScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+
+  useEffect(() => {
+    if (!contentRef.current) return;
+    const els = contentRef.current.querySelectorAll(".reveal-item");
+    gsap.fromTo(els,
+      { y: 32, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, ease: "power3.out", stagger: 0.1, delay: 0.15 }
+    );
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
 
         {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)]">
-          <button onClick={() => router.push("/events")} className="hover:text-[var(--accent-dark)]">Events</button>
+        <nav className="reveal-item mb-6 flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)]">
+          <button onClick={() => router.push("/events")} className="hover:text-[var(--accent-dark)] transition-colors">Events</button>
           <ChevronRight size={13} />
           <span>{category?.category_name}</span>
           <ChevronRight size={13} />
           <span className="truncate text-[var(--accent-dark)]">{event_name}</span>
         </nav>
 
-        {/* Banner */}
-        <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-xl bg-zinc-100">
-          <Image
-            src={`https://picsum.photos/seed/${bannerSeed}/1280/720`}
-            alt={event_name}
-            fill
-            className="object-cover"
-            placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-            priority
-          />
+        {/* Banner — Ken Burns parallax */}
+        <div ref={bannerRef} className="reveal-item relative mb-8 aspect-video w-full overflow-hidden rounded-2xl bg-zinc-100 shadow-[0_24px_60px_rgba(46,34,27,0.14)]">
+          <motion.div className="absolute inset-0" style={{ y: bannerY, scale: bannerScale }}>
+            <Image
+              src={`https://picsum.photos/seed/${bannerSeed}/1280/720`}
+              alt={event_name}
+              fill
+              className="object-cover"
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+              priority
+            />
+          </motion.div>
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         </div>
 
         {/* Two-column layout */}
-        <div className="flex flex-col gap-10 lg:flex-row">
+        <div ref={contentRef} className="flex flex-col gap-10 lg:flex-row">
 
           {/* ── LEFT COLUMN ── */}
           <div className="min-w-0 flex-1 space-y-10">
 
             {/* Title + meta */}
-            <div>
+            <div className="reveal-item">
               <h1 className="font-display mb-4 text-3xl font-bold text-[var(--accent-dark)]">{event_name}</h1>
               <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--text-secondary)]">
                 <Badge variant="category">{category?.category_name}</Badge>
@@ -200,7 +218,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
 
             {/* Artists */}
             {artists.length > 0 && (
-              <section>
+              <section className="reveal-item">
                 <h2 className="mb-4 text-base font-semibold text-[var(--accent-dark)]">Performing</h2>
                 <div className="flex gap-3 overflow-x-auto pb-2">
                   {artists.map((a) => (
@@ -220,7 +238,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
             )}
 
             {/* About */}
-            <section>
+            <section className="reveal-item">
               <h2 className="mb-3 text-base font-semibold text-[var(--accent-dark)]">About this Event</h2>
               <div className="text-sm leading-relaxed text-[var(--text-secondary)]">
                 <AnimatePresence initial={false}>
@@ -246,7 +264,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
 
             {/* Venue */}
             {venue && (
-              <section>
+              <section className="reveal-item">
                 <h2 className="mb-3 text-base font-semibold text-[var(--accent-dark)]">Venue</h2>
                 <div className="rounded-xl border border-[var(--border)] p-5">
                   <p className="mb-1 text-base font-semibold text-[var(--accent-dark)]">{venue.venue_name}</p>
@@ -264,7 +282,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
             )}
 
             {/* Reviews */}
-            <section>
+            <section className="reveal-item">
               <h2 className="mb-4 text-base font-semibold text-[var(--accent-dark)]">Reviews</h2>
 
               {reviews.length > 0 ? (

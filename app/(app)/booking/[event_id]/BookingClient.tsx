@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 import { useBookingStore, getSeatPrice, calcPricing, CONVENIENCE_FEE } from "@/lib/store/bookingStore";
 import { useUserStore } from "@/lib/store/userStore";
 import { useBookingFlow } from "@/lib/hooks/useBookingFlow";
-import StepIndicator from "@/components/ui/StepIndicator";
 import CountdownTimer from "@/components/ui/CountdownTimer";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -118,6 +117,7 @@ function SeatStep({ event }: { event: EventSummary }) {
 
   const grouped = groupByRow(seats);
   const rows = Object.keys(grouped).sort();
+  const allSeats = rows.flatMap((r) => grouped[r]);
 
   return (
     <>
@@ -125,50 +125,55 @@ function SeatStep({ event }: { event: EventSummary }) {
         {/* ── Seat map ── */}
         <div className="min-w-0 flex-1">
           {/* Countdown */}
-          <div className="mb-4 flex items-center gap-3 rounded-xl border border-[var(--border)] px-4 py-3">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+            className="mb-4 flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] px-4 py-3"
+          >
             <span className="text-sm text-[var(--text-secondary)]">Seats held for you:</span>
             <CountdownTimer key={timerKey} seconds={600} onExpire={handleExpire} />
-          </div>
+          </motion.div>
 
           {/* Screen arc */}
-          <div className="mb-6 text-center">
-            <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
-              Screen this side
-            </p>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="mb-6 text-center">
+            <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">Screen this side</p>
             <svg viewBox="0 0 320 24" className="mx-auto w-full max-w-sm" fill="none">
-              <path
+              <motion.path
                 d="M10 20 Q160 2 310 20"
-                stroke="#D1D9E6"
-                strokeWidth="3"
-                strokeLinecap="round"
+                stroke="#D1D9E6" strokeWidth="3" strokeLinecap="round"
+                initial={{ pathLength: 0 }} animate={{ pathLength: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
               />
             </svg>
-          </div>
+          </motion.div>
 
           {/* Seat grid */}
           {loading ? (
-            <div className="flex h-40 items-center justify-center text-sm text-[var(--text-muted)]">
-              Loading seats…
+            <div className="grid grid-cols-10 gap-1.5 pb-4">
+              {Array.from({ length: 40 }).map((_, i) => (
+                <motion.div key={i} className="h-8 w-8 rounded-[6px] bg-[#f2e7da]"
+                  animate={{ opacity: [0.4, 0.9, 0.4] }}
+                  transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.02 }}
+                />
+              ))}
             </div>
           ) : (
-            <div className="overflow-auto touch-manipulation">
+            <div className="overflow-auto seat-scroll touch-manipulation">
               <div className="inline-block min-w-full space-y-2 pb-4">
                 {rows.map((row) => (
                   <div key={row} className="flex items-center gap-2">
-                    <span className="w-5 shrink-0 text-center text-[13px] font-semibold text-[var(--text-secondary)]">
-                      {row}
-                    </span>
+                    <span className="w-5 shrink-0 text-center text-[13px] font-semibold text-[var(--text-secondary)]">{row}</span>
                     <div className="flex flex-wrap gap-1.5">
                       {grouped[row].map((seat) => {
                         const isSelected = selectedSeats.some((s) => s.seat_id === seat.seat_id);
                         const isBooked = seat.status === "booked";
-
+                        const globalIdx = allSeats.findIndex((s) => s.seat_id === seat.seat_id);
                         return (
                           <SeatButton
                             key={seat.seat_id}
                             seat={seat}
                             isSelected={isSelected}
                             isBooked={isBooked}
+                            index={globalIdx}
                             onToggle={() => !isBooked && toggleSeat(seat)}
                           />
                         );
@@ -197,49 +202,70 @@ function SeatStep({ event }: { event: EventSummary }) {
 
         {/* ── Booking summary panel ── */}
         <aside className="w-full lg:w-[320px] lg:shrink-0">
-          <div className="sticky top-24 rounded-2xl border border-[var(--border)] p-5">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 300, damping: 28 }}
+            className="sticky top-24 rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-5 shadow-[0_16px_40px_rgba(46,34,27,0.08)]"
+          >
             <p className="mb-0.5 text-base font-semibold text-[var(--accent-dark)]">{event.event_name}</p>
             <p className="mb-4 text-[13px] text-[var(--text-secondary)]">
               {event.venue?.venue_name} · {formatDate(event.event_date)}
             </p>
 
-            {selectedSeats.length === 0 ? (
-              <p className="mb-4 text-sm text-[var(--text-muted)]">No seats selected yet.</p>
-            ) : (
-              <div className="mb-4 space-y-1.5">
-                {selectedSeats.map((s) => (
-                  <div key={s.seat_id} className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-[var(--accent-dark)]">Seat {s.seat_number}</span>
-                    <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-                      <span>₹{getSeatPrice(s.seat_number).toLocaleString("en-IN")}</span>
-                      <button
-                        onClick={() => setSeats(selectedSeats.filter((x) => x.seat_id !== s.seat_id))}
-                        className="text-[var(--text-muted)] hover:text-red-500"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <AnimatePresence mode="popLayout">
+              {selectedSeats.length === 0 ? (
+                <motion.p key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                  className="mb-4 text-sm text-[var(--text-muted)]"
+                >
+                  No seats selected yet.
+                </motion.p>
+              ) : (
+                <motion.div key="seats" className="mb-4 space-y-1.5">
+                  {selectedSeats.map((s) => (
+                    <motion.div key={s.seat_id}
+                      initial={{ opacity: 0, x: -12, height: 0 }}
+                      animate={{ opacity: 1, x: 0, height: "auto" }}
+                      exit={{ opacity: 0, x: 12, height: 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 28 }}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="font-medium text-[var(--accent-dark)]">Seat {s.seat_number}</span>
+                      <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                        <span>₹{getSeatPrice(s.seat_number).toLocaleString("en-IN")}</span>
+                        <motion.button
+                          whileHover={{ scale: 1.2, color: "#dc2626" }}
+                          whileTap={{ scale: 0.85 }}
+                          onClick={() => setSeats(selectedSeats.filter((x) => x.seat_id !== s.seat_id))}
+                          className="text-[var(--text-muted)]"
+                        >
+                          <Trash2 size={13} />
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {selectedSeats.length > 0 && (
-              <div className="mb-5 border-t border-[var(--border)] pt-4">
+              <motion.div
+                initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
+                className="mb-5 border-t border-[var(--border)] pt-4 overflow-hidden"
+              >
                 <PriceBreakdown seats={selectedSeats} discount={appliedDiscount} />
-              </div>
+              </motion.div>
             )}
 
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full"
-              disabled={selectedSeats.length === 0}
-              onClick={nextStep}
-            >
-              Continue to Review
-            </Button>
-          </div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                variant="primary" size="lg" className="w-full"
+                disabled={selectedSeats.length === 0}
+                onClick={nextStep}
+              >
+                Continue to Review
+              </Button>
+            </motion.div>
+          </motion.div>
         </aside>
       </div>
 
@@ -259,43 +285,42 @@ function SeatStep({ event }: { event: EventSummary }) {
 // ─── Seat button with GSAP-style spring via Framer ───────────────────────────
 
 function SeatButton({
-  seat,
-  isSelected,
-  isBooked,
-  onToggle,
+  seat, isSelected, isBooked, index, onToggle,
 }: {
-  seat: Seat;
-  isSelected: boolean;
-  isBooked: boolean;
-  onToggle: () => void;
+  seat: Seat; isSelected: boolean; isBooked: boolean; index: number; onToggle: () => void;
 }) {
-  const [animate, setAnimate] = useState(false);
-
-  function handleClick() {
-    if (isBooked) return;
-    if (!isSelected) {
-      setAnimate(true);
-      setTimeout(() => setAnimate(false), 350);
-    }
-    onToggle();
-  }
-
   return (
     <motion.button
       title={`Seat ${seat.seat_number}`}
-      onClick={handleClick}
-      animate={animate ? { scale: [1, 0.85, 1.1, 1] } : {}}
-      transition={{ duration: 0.3, ease: "easeOut" }}
+      onClick={onToggle}
+      initial={{ scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 500, damping: 22, delay: index * 0.008 }}
+      whileHover={!isBooked ? { scale: 1.18, zIndex: 10 } : {}}
+      whileTap={!isBooked ? { scale: 0.88 } : {}}
       className={cn(
-        "relative flex h-8 w-8 items-center justify-center rounded-[6px] text-[8px] transition-colors",
+        "relative flex h-8 w-8 items-center justify-center rounded-[6px] text-[8px]",
         isBooked
           ? "cursor-not-allowed bg-[#EEEEEE] text-[var(--text-muted)]"
           : isSelected
-          ? "neu-pressed border border-[var(--accent-light)] bg-[#EEF2FF] text-[var(--accent-light)]"
-          : "neu-raised bg-[#f2e7da] text-[var(--text-secondary)] hover:bg-[#EAEEF2]",
+          ? "neu-pressed border border-[var(--accent-light)] bg-[#EEF2FF] text-[var(--accent-light)] shadow-[0_0_10px_rgba(182,91,58,0.3)]"
+          : "neu-raised bg-[#f2e7da] text-[var(--text-secondary)]",
       )}
     >
-      {isBooked ? <X size={8} /> : isSelected ? <Check size={8} /> : null}
+      <AnimatePresence mode="wait">
+        {isBooked ? (
+          <motion.span key="x" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
+            <X size={8} />
+          </motion.span>
+        ) : isSelected ? (
+          <motion.span key="check"
+            initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 600, damping: 18 }}
+          >
+            <Check size={8} />
+          </motion.span>
+        ) : null}
+      </AnimatePresence>
     </motion.button>
   );
 }
@@ -475,9 +500,9 @@ function ReviewStep({ event }: { event: EventSummary }) {
 const STEP_LABELS = ["Seats", "Review", "Payment"];
 
 const slideVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
+  enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0, filter: "blur(4px)" }),
+  center: { x: 0, opacity: 1, filter: "blur(0px)" },
+  exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0, filter: "blur(4px)" }),
 };
 
 export default function BookingClient({ event }: { event: EventSummary }) {
@@ -493,31 +518,49 @@ export default function BookingClient({ event }: { event: EventSummary }) {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="font-display mb-6 text-2xl font-bold text-[var(--accent-dark)]">
-          {event.event_name}
-        </h1>
-        <div className="flex items-center gap-4">
-          <StepIndicator currentStep={currentStep} totalSteps={3} />
-          <div className="flex gap-6">
-            {STEP_LABELS.map((label, i) => (
-              <span
-                key={label}
-                className={cn(
-                  "text-sm",
-                  i + 1 === currentStep
-                    ? "font-semibold text-[var(--accent-dark)]"
-                    : i + 1 < currentStep
-                    ? "text-[var(--accent-light)]"
-                    : "text-[var(--text-muted)]",
+      <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-8">
+        <p className="font-mono text-[11px] tracking-[0.22em] text-[var(--accent)] mb-2">BOOKING</p>
+        <h1 className="font-display mb-6 text-2xl font-bold text-[var(--accent-dark)]">{event.event_name}</h1>
+
+        {/* Animated step bar */}
+        <div className="flex items-center gap-0">
+          {STEP_LABELS.map((label, i) => {
+            const stepNum = i + 1;
+            const done = stepNum < currentStep;
+            const active = stepNum === currentStep;
+            return (
+              <div key={label} className="flex items-center">
+                <div className="flex flex-col items-center gap-1">
+                  <motion.div
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold",
+                      done ? "bg-[var(--accent)] text-white" :
+                      active ? "bg-[var(--accent-dark)] text-white shadow-[0_0_0_4px_rgba(182,91,58,0.2)]" :
+                      "neu-raised text-[var(--text-muted)]"
+                    )}
+                    animate={{ scale: active ? 1.1 : 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  >
+                    {done ? <Check size={13} /> : stepNum}
+                  </motion.div>
+                  <span className={cn("text-[11px] font-medium",
+                    active ? "text-[var(--accent-dark)]" : done ? "text-[var(--accent)]" : "text-[var(--text-muted)]"
+                  )}>{label}</span>
+                </div>
+                {i < STEP_LABELS.length - 1 && (
+                  <div className="relative mx-2 mb-4 h-[2px] w-12 bg-[var(--border)] overflow-hidden">
+                    <motion.div
+                      className="absolute inset-y-0 left-0 bg-[var(--accent)]"
+                      animate={{ width: done ? "100%" : "0%" }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    />
+                  </div>
                 )}
-              >
-                {label}
-              </span>
-            ))}
-          </div>
+              </div>
+            );
+          })}
         </div>
-      </div>
+      </motion.div>
 
       {/* Step content */}
       <AnimatePresence mode="wait" custom={dir}>

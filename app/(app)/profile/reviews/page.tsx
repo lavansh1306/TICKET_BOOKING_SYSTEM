@@ -44,7 +44,8 @@ export default function ProfileReviewsPage() {
 
         const [reviewsJson, eventsJson] = await Promise.all([reviewsRes.json(), eventsRes.json()]);
         if (!active) return;
-        setReviews(reviewsJson.data ?? []);
+        const allReviews = reviewsJson.data ?? [];
+        setReviews(allReviews.filter((r: ReviewItem) => r.user_id === user?.user_id));
         setEvents(eventsJson.data ?? []);
       } finally {
         if (active) setLoading(false);

@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   }
 
   const { user_id, event_id } = parsed.data;
-  const booking_date = parsed.data.booking_date ?? new Date().toISOString();
+  const booking_date = parsed.data.booking_date ?? new Date().toISOString().slice(0, 10);
 
   const [result] = await db.query<ResultSetHeader>(
     "INSERT INTO Booking (user_id, event_id, booking_date) VALUES (?, ?, ?)",
