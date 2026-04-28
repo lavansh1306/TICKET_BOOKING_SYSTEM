@@ -1,44 +1,84 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import toast from "react-hot-toast";
+
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 import { useUserStore } from "@/lib/store/userStore";
-import { users } from "@/lib/mock";
 
 export default function LoginPage() {
   const router = useRouter();
   const params = useSearchParams();
   const setUser = useUserStore((s) => s.setUser);
 
-  function login(userId: number) {
-    const user = users.find((u) => u.user_id === userId)!;
-    setUser(user);
-    const returnUrl = params.get("returnUrl") ?? "/events";
-    router.push(returnUrl);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const json = await response.json();
+
+      if (!response.ok) {
+        toast.error(json.error ?? "Unable to login");
+        return;
+      }
+
+      setUser(json.data);
+      const returnUrl = params.get("returnUrl") ?? "/events";
+      router.push(returnUrl);
+    } catch {
+      toast.error("Network error while logging in");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-[var(--border)] p-8">
-        <h1 className="font-display mb-1 text-2xl font-bold text-[var(--accent-dark)]">Dev Login</h1>
-        <p className="mb-6 text-sm text-[var(--text-muted)]">Pick any mock user to sign in instantly.</p>
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--bg-secondary)] p-8 shadow-sm">
+        <h1 className="font-display mb-2 text-3xl font-bold text-[var(--accent-dark)]">Welcome back</h1>
+        <p className="mb-6 text-sm text-[var(--text-secondary)]">Sign in with your database account.</p>
 
-        <div className="space-y-2">
-          {users.map((u) => (
-            <button
-              key={u.user_id}
-              onClick={() => login(u.user_id)}
-              className="neu-raised flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left hover:bg-[#f2e7da]"
-            >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-white">
-                {u.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-[var(--accent-dark)]">{u.name}</p>
-                <p className="text-xs text-[var(--text-muted)]">{u.email}</p>
-              </div>
-            </button>
-          ))}
-        </div>
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <Input
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+          />
+          <Input
+            label="Password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Your password"
+          />
+
+          <Button type="submit" className="w-full" loading={loading}>
+            Sign In
+          </Button>
+        </form>
+
+        <button
+          type="button"
+          className="mt-4 text-sm font-medium text-[var(--accent)] hover:underline"
+          onClick={() => router.push("/auth/register")}
+        >
+          Create a new account
+        </button>
       </div>
     </div>
   );

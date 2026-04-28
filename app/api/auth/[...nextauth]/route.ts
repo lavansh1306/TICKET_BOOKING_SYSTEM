@@ -1,8 +1,18 @@
+import bcrypt from "bcrypt";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { RowDataPacket } from "mysql2/promise";
 
-import { users } from "@/lib/mock";
+import db from "@/lib/db";
 import { loginSchema } from "@/lib/validations/auth";
+
+interface UserRow extends RowDataPacket {
+  user_id: number;
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+}
 
 const auth = NextAuth({
   providers: [
@@ -19,20 +29,27 @@ const auth = NextAuth({
           return null;
         }
 
-        const matched = users.find(
-          (user) =>
-            user.email.toLowerCase() === parsed.data.email.toLowerCase() &&
-            user.password === parsed.data.password,
+        const [rows] = await db.query<UserRow[]>(
+          "SELECT user_id, name, email, phone, password FROM `Users` WHERE email = ? LIMIT 1",
+          [parsed.data.email.toLowerCase()],
         );
 
-        if (!matched) {
+        const user = rows[0];
+
+        if (!user) {
+          return null;
+        }
+
+        const passwordMatches = await bcrypt.compare(parsed.data.password, user.password);
+
+        if (!passwordMatches) {
           return null;
         }
 
         return {
-          id: String(matched.user_id),
-          name: matched.name,
-          email: matched.email,
+          id: String(user.user_id),
+          name: user.name,
+          email: user.email,
         };
       },
     }),
