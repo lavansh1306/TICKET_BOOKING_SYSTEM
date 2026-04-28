@@ -74,7 +74,7 @@ function SeatIndicator({ available, total }: { available: number; total: number 
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-sm">
         <span className={cn("font-semibold", color)}>{label}</span>
-        <span className="text-[#6B6B6B]">
+        <span className="text-[var(--text-secondary)]">
           {available}/{total} left
         </span>
       </div>
@@ -154,12 +154,12 @@ export default function EventDetailClient({ event }: { event: EventData }) {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
 
         {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-1.5 text-[13px] text-[#6B6B6B]">
-          <button onClick={() => router.push("/events")} className="hover:text-[#0A0A0A]">Events</button>
+        <nav className="mb-6 flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)]">
+          <button onClick={() => router.push("/events")} className="hover:text-[var(--accent-dark)]">Events</button>
           <ChevronRight size={13} />
           <span>{category?.category_name}</span>
           <ChevronRight size={13} />
-          <span className="truncate text-[#0A0A0A]">{event_name}</span>
+          <span className="truncate text-[var(--accent-dark)]">{event_name}</span>
         </nav>
 
         {/* Banner */}
@@ -183,8 +183,8 @@ export default function EventDetailClient({ event }: { event: EventData }) {
 
             {/* Title + meta */}
             <div>
-              <h1 className="font-display mb-4 text-3xl font-bold text-[#0A0A0A]">{event_name}</h1>
-              <div className="flex flex-wrap items-center gap-3 text-sm text-[#6B6B6B]">
+              <h1 className="font-display mb-4 text-3xl font-bold text-[var(--accent-dark)]">{event_name}</h1>
+              <div className="flex flex-wrap items-center gap-3 text-sm text-[var(--text-secondary)]">
                 <Badge variant="category">{category?.category_name}</Badge>
                 {venue && (
                   <span className="flex items-center gap-1">
@@ -201,17 +201,17 @@ export default function EventDetailClient({ event }: { event: EventData }) {
             {/* Artists */}
             {artists.length > 0 && (
               <section>
-                <h2 className="mb-4 text-base font-semibold text-[#0A0A0A]">Performing</h2>
+                <h2 className="mb-4 text-base font-semibold text-[var(--accent-dark)]">Performing</h2>
                 <div className="flex gap-3 overflow-x-auto pb-2">
                   {artists.map((a) => (
                     <div
                       key={a.artist_id}
-                      className="flex min-w-[140px] flex-col items-center gap-2 rounded-xl border border-[#E4E4E7] p-4"
+                      className="flex min-w-[140px] flex-col items-center gap-2 rounded-xl border border-[var(--border)] p-4"
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700">
                         {a.artist_name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()}
                       </div>
-                      <span className="text-center text-sm font-semibold text-[#0A0A0A]">{a.artist_name}</span>
+                      <span className="text-center text-sm font-semibold text-[var(--accent-dark)]">{a.artist_name}</span>
                       <Badge variant="default" className="text-[10px]">{a.genre}</Badge>
                     </div>
                   ))}
@@ -221,8 +221,8 @@ export default function EventDetailClient({ event }: { event: EventData }) {
 
             {/* About */}
             <section>
-              <h2 className="mb-3 text-base font-semibold text-[#0A0A0A]">About this Event</h2>
-              <div className="text-sm leading-relaxed text-[#6B6B6B]">
+              <h2 className="mb-3 text-base font-semibold text-[var(--accent-dark)]">About this Event</h2>
+              <div className="text-sm leading-relaxed text-[var(--text-secondary)]">
                 <AnimatePresence initial={false}>
                   <motion.div
                     key={showFullAbout ? "full" : "short"}
@@ -238,7 +238,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
               </div>
               <button
                 onClick={() => setShowFullAbout((v) => !v)}
-                className="mt-2 text-sm font-medium text-[#4F46E5] hover:underline"
+                className="mt-2 text-sm font-medium text-[var(--accent-light)] hover:underline"
               >
                 {showFullAbout ? "Show less" : "Show more"}
               </button>
@@ -247,16 +247,16 @@ export default function EventDetailClient({ event }: { event: EventData }) {
             {/* Venue */}
             {venue && (
               <section>
-                <h2 className="mb-3 text-base font-semibold text-[#0A0A0A]">Venue</h2>
-                <div className="rounded-xl border border-[#E4E4E7] p-5">
-                  <p className="mb-1 text-base font-semibold text-[#0A0A0A]">{venue.venue_name}</p>
-                  <p className="mb-1 flex items-center gap-1.5 text-sm text-[#6B6B6B]">
+                <h2 className="mb-3 text-base font-semibold text-[var(--accent-dark)]">Venue</h2>
+                <div className="rounded-xl border border-[var(--border)] p-5">
+                  <p className="mb-1 text-base font-semibold text-[var(--accent-dark)]">{venue.venue_name}</p>
+                  <p className="mb-1 flex items-center gap-1.5 text-sm text-[var(--text-secondary)]">
                     <MapPin size={14} /> {venue.location}
                   </p>
-                  <p className="mb-4 flex items-center gap-1.5 text-sm text-[#6B6B6B]">
+                  <p className="mb-4 flex items-center gap-1.5 text-sm text-[var(--text-secondary)]">
                     <Users size={14} /> Capacity: {venue.capacity.toLocaleString("en-IN")} seats
                   </p>
-                  <div className="flex h-36 items-center justify-center rounded-lg bg-zinc-100 text-sm text-[#9B9B9B]">
+                  <div className="flex h-36 items-center justify-center rounded-lg bg-zinc-100 text-sm text-[var(--text-muted)]">
                     Map unavailable
                   </div>
                 </div>
@@ -265,28 +265,28 @@ export default function EventDetailClient({ event }: { event: EventData }) {
 
             {/* Reviews */}
             <section>
-              <h2 className="mb-4 text-base font-semibold text-[#0A0A0A]">Reviews</h2>
+              <h2 className="mb-4 text-base font-semibold text-[var(--accent-dark)]">Reviews</h2>
 
               {reviews.length > 0 ? (
                 <>
                   {/* Average + breakdown */}
                   <div className="mb-6 flex flex-col gap-6 sm:flex-row sm:items-start">
                     <div className="flex flex-col items-center gap-1">
-                      <span className="font-display text-5xl font-extrabold text-[#1A1A2E]">
+                      <span className="font-display text-5xl font-extrabold text-[var(--accent)]">
                         {avgRating.toFixed(1)}
                       </span>
                       <StarRow rating={avgRating} size={18} />
-                      <span className="text-sm text-[#6B6B6B]">{reviews.length} review{reviews.length !== 1 ? "s" : ""}</span>
+                      <span className="text-sm text-[var(--text-secondary)]">{reviews.length} review{reviews.length !== 1 ? "s" : ""}</span>
                     </div>
                     <div className="flex-1 space-y-2">
                       {ratingCounts.map(({ star, count }) => {
                         const pct = reviews.length ? (count / reviews.length) * 100 : 0;
                         return (
-                          <div key={star} className="flex items-center gap-3 text-sm text-[#6B6B6B]">
+                          <div key={star} className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
                             <span className="w-4 text-right">{star}★</span>
                             <div className="h-1 flex-1 overflow-hidden rounded-full bg-zinc-100">
                               <div
-                                className="h-full rounded-full bg-[#4F46E5] transition-all"
+                                className="h-full rounded-full bg-[var(--accent-light)] transition-all"
                                 style={{ width: `${pct}%` }}
                               />
                             </div>
@@ -300,12 +300,12 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                   {/* Review cards */}
                   <div className="space-y-3">
                     {visibleReviews.map((r) => (
-                      <div key={r.review_id} className="rounded-2xl border border-[#E4E4E7] p-4">
+                      <div key={r.review_id} className="rounded-2xl border border-[var(--border)] p-4">
                         <div className="mb-2 flex items-center justify-between">
-                          <span className="text-sm font-semibold text-[#0A0A0A]">{r.user?.name ?? "Anonymous"}</span>
+                          <span className="text-sm font-semibold text-[var(--accent-dark)]">{r.user?.name ?? "Anonymous"}</span>
                           <StarRow rating={r.rating} size={13} />
                         </div>
-                        <p className="text-sm leading-relaxed text-[#6B6B6B]">{r.comment}</p>
+                        <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{r.comment}</p>
                       </div>
                     ))}
                   </div>
@@ -313,14 +313,14 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                   {reviews.length > 3 && (
                     <button
                       onClick={() => setShowAllReviews((v) => !v)}
-                      className="mt-3 text-sm font-medium text-[#4F46E5] hover:underline"
+                      className="mt-3 text-sm font-medium text-[var(--accent-light)] hover:underline"
                     >
                       {showAllReviews ? "Show less" : `Show all ${reviews.length} reviews`}
                     </button>
                   )}
                 </>
               ) : (
-                <p className="text-sm text-[#9B9B9B]">No reviews yet. Be the first to review!</p>
+                <p className="text-sm text-[var(--text-muted)]">No reviews yet. Be the first to review!</p>
               )}
 
               {isAuthed && (
@@ -335,15 +335,15 @@ export default function EventDetailClient({ event }: { event: EventData }) {
 
           {/* ── RIGHT COLUMN ── */}
           <aside className="w-full lg:w-[360px] lg:shrink-0">
-            <div className="sticky top-24 rounded-2xl border border-[#E4E4E7] p-6">
-              <h3 className="mb-5 text-xl font-bold text-[#0A0A0A]">Book Tickets</h3>
+            <div className="sticky top-24 rounded-2xl border border-[var(--border)] p-6">
+              <h3 className="mb-5 text-xl font-bold text-[var(--accent-dark)]">Book Tickets</h3>
 
               <SeatIndicator available={availableSeats} total={totalSeats} />
 
-              <div className="my-5 space-y-2 border-t border-[#E4E4E7] pt-5 text-sm text-[#6B6B6B]">
+              <div className="my-5 space-y-2 border-t border-[var(--border)] pt-5 text-sm text-[var(--text-secondary)]">
                 <div className="flex items-center gap-2">
                   <Calendar size={15} />
-                  <span className="font-medium text-[#0A0A0A]">{formatDate(event_date)}</span>
+                  <span className="font-medium text-[var(--accent-dark)]">{formatDate(event_date)}</span>
                 </div>
                 {venue && (
                   <div className="flex items-center gap-2">
@@ -359,9 +359,9 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                 )}
               </div>
 
-              <div className="mb-5 border-t border-[#E4E4E7] pt-5">
-                <p className="text-lg font-semibold text-[#1A1A2E]">Seats from ₹150</p>
-                <p className="mt-0.5 text-[13px] text-[#6B6B6B]">Convenience fee: ₹29/ticket</p>
+              <div className="mb-5 border-t border-[var(--border)] pt-5">
+                <p className="text-lg font-semibold text-[var(--accent)]">Seats from ₹150</p>
+                <p className="mt-0.5 text-[13px] text-[var(--text-secondary)]">Convenience fee: ₹29/ticket</p>
               </div>
 
               <Button
@@ -381,14 +381,14 @@ export default function EventDetailClient({ event }: { event: EventData }) {
                   onClick={() => navigator.share?.({ title: event_name, url: window.location.href })}
                   aria-label="Share"
                 >
-                  <Share2 size={15} className="text-[#6B6B6B]" />
+                  <Share2 size={15} className="text-[var(--text-secondary)]" />
                 </button>
                 <button
                   className="neu-raised flex h-9 w-9 items-center justify-center rounded-full"
                   onClick={handleCopy}
                   aria-label="Copy link"
                 >
-                  <Copy size={15} className={copied ? "text-green-600" : "text-[#6B6B6B]"} />
+                  <Copy size={15} className={copied ? "text-green-600" : "text-[var(--text-secondary)]"} />
                 </button>
                 {copied && <span className="text-xs text-green-600">Copied!</span>}
               </div>
@@ -402,7 +402,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
         <div className="space-y-5">
           {/* Star selector */}
           <div>
-            <p className="mb-2 text-sm font-medium text-[#0A0A0A]">Your rating</p>
+            <p className="mb-2 text-sm font-medium text-[var(--accent-dark)]">Your rating</p>
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((s) => (
                 <button
@@ -427,9 +427,9 @@ export default function EventDetailClient({ event }: { event: EventData }) {
 
           {/* Comment */}
           <div>
-            <p className="mb-2 text-sm font-medium text-[#0A0A0A]">Your review</p>
+            <p className="mb-2 text-sm font-medium text-[var(--accent-dark)]">Your review</p>
             <textarea
-              className="neu-pressed w-full resize-none rounded-xl p-3 text-sm text-[#0A0A0A] outline-none placeholder:text-[#9B9B9B]"
+              className="neu-pressed w-full resize-none rounded-xl p-3 text-sm text-[var(--accent-dark)] outline-none placeholder:text-[var(--text-muted)]"
               rows={4}
               maxLength={255}
               placeholder="Share your experience…"
@@ -440,7 +440,7 @@ export default function EventDetailClient({ event }: { event: EventData }) {
               {reviewErrors.comment ? (
                 <p className="text-xs text-red-600">{reviewErrors.comment[0]}</p>
               ) : <span />}
-              <span className="text-xs text-[#9B9B9B]">{comment.length}/255</span>
+              <span className="text-xs text-[var(--text-muted)]">{comment.length}/255</span>
             </div>
           </div>
 

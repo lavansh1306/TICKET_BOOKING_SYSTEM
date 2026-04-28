@@ -51,7 +51,7 @@ function PriceBreakdown({
 }) {
   const { subtotal, convFee, gst, discountAmt, total } = calcPricing(seats, discount);
   const row = (label: string, value: string, bold = false) => (
-    <div className={cn("flex justify-between text-sm", bold ? "font-bold text-[#0A0A0A]" : "text-[#6B6B6B]")}>
+    <div className={cn("flex justify-between text-sm", bold ? "font-bold text-[var(--accent-dark)]" : "text-[var(--text-secondary)]")}>
       <span>{label}</span>
       <span>₹{value}</span>
     </div>
@@ -68,7 +68,7 @@ function PriceBreakdown({
           <span>−₹{discountAmt.toLocaleString("en-IN")}</span>
         </div>
       )}
-      <div className="border-t border-[#E4E4E7] pt-1.5">
+      <div className="border-t border-[var(--border)] pt-1.5">
         {row("Total", total.toLocaleString("en-IN"), true)}
       </div>
     </div>
@@ -125,14 +125,14 @@ function SeatStep({ event }: { event: EventSummary }) {
         {/* ── Seat map ── */}
         <div className="min-w-0 flex-1">
           {/* Countdown */}
-          <div className="mb-4 flex items-center gap-3 rounded-xl border border-[#E4E4E7] px-4 py-3">
-            <span className="text-sm text-[#6B6B6B]">Seats held for you:</span>
+          <div className="mb-4 flex items-center gap-3 rounded-xl border border-[var(--border)] px-4 py-3">
+            <span className="text-sm text-[var(--text-secondary)]">Seats held for you:</span>
             <CountdownTimer key={timerKey} seconds={600} onExpire={handleExpire} />
           </div>
 
           {/* Screen arc */}
           <div className="mb-6 text-center">
-            <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-[#9B9B9B]">
+            <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
               Screen this side
             </p>
             <svg viewBox="0 0 320 24" className="mx-auto w-full max-w-sm" fill="none">
@@ -147,7 +147,7 @@ function SeatStep({ event }: { event: EventSummary }) {
 
           {/* Seat grid */}
           {loading ? (
-            <div className="flex h-40 items-center justify-center text-sm text-[#9B9B9B]">
+            <div className="flex h-40 items-center justify-center text-sm text-[var(--text-muted)]">
               Loading seats…
             </div>
           ) : (
@@ -155,7 +155,7 @@ function SeatStep({ event }: { event: EventSummary }) {
               <div className="inline-block min-w-full space-y-2 pb-4">
                 {rows.map((row) => (
                   <div key={row} className="flex items-center gap-2">
-                    <span className="w-5 shrink-0 text-center text-[13px] font-semibold text-[#6B6B6B]">
+                    <span className="w-5 shrink-0 text-center text-[13px] font-semibold text-[var(--text-secondary)]">
                       {row}
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -183,11 +183,11 @@ function SeatStep({ event }: { event: EventSummary }) {
           {/* Legend */}
           <div className="mt-6 flex flex-wrap gap-4">
             {[
-              { label: "Available", cls: "neu-raised bg-[#F5F5F7]" },
-              { label: "Selected", cls: "neu-pressed bg-[#EEF2FF] border border-[#4F46E5]" },
+              { label: "Available", cls: "neu-raised bg-[#f2e7da]" },
+              { label: "Selected", cls: "neu-pressed bg-[#EEF2FF] border border-[var(--accent-light)]" },
               { label: "Booked", cls: "bg-[#EEEEEE] cursor-not-allowed" },
             ].map(({ label, cls }) => (
-              <div key={label} className="flex items-center gap-2 text-sm text-[#6B6B6B]">
+              <div key={label} className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
                 <span className={cn("h-5 w-5 rounded-[4px]", cls)} />
                 {label}
               </div>
@@ -197,24 +197,24 @@ function SeatStep({ event }: { event: EventSummary }) {
 
         {/* ── Booking summary panel ── */}
         <aside className="w-full lg:w-[320px] lg:shrink-0">
-          <div className="sticky top-24 rounded-2xl border border-[#E4E4E7] p-5">
-            <p className="mb-0.5 text-base font-semibold text-[#0A0A0A]">{event.event_name}</p>
-            <p className="mb-4 text-[13px] text-[#6B6B6B]">
+          <div className="sticky top-24 rounded-2xl border border-[var(--border)] p-5">
+            <p className="mb-0.5 text-base font-semibold text-[var(--accent-dark)]">{event.event_name}</p>
+            <p className="mb-4 text-[13px] text-[var(--text-secondary)]">
               {event.venue?.venue_name} · {formatDate(event.event_date)}
             </p>
 
             {selectedSeats.length === 0 ? (
-              <p className="mb-4 text-sm text-[#9B9B9B]">No seats selected yet.</p>
+              <p className="mb-4 text-sm text-[var(--text-muted)]">No seats selected yet.</p>
             ) : (
               <div className="mb-4 space-y-1.5">
                 {selectedSeats.map((s) => (
                   <div key={s.seat_id} className="flex items-center justify-between text-sm">
-                    <span className="font-medium text-[#0A0A0A]">Seat {s.seat_number}</span>
-                    <div className="flex items-center gap-2 text-[#6B6B6B]">
+                    <span className="font-medium text-[var(--accent-dark)]">Seat {s.seat_number}</span>
+                    <div className="flex items-center gap-2 text-[var(--text-secondary)]">
                       <span>₹{getSeatPrice(s.seat_number).toLocaleString("en-IN")}</span>
                       <button
                         onClick={() => setSeats(selectedSeats.filter((x) => x.seat_id !== s.seat_id))}
-                        className="text-[#9B9B9B] hover:text-red-500"
+                        className="text-[var(--text-muted)] hover:text-red-500"
                       >
                         <Trash2 size={13} />
                       </button>
@@ -225,7 +225,7 @@ function SeatStep({ event }: { event: EventSummary }) {
             )}
 
             {selectedSeats.length > 0 && (
-              <div className="mb-5 border-t border-[#E4E4E7] pt-4">
+              <div className="mb-5 border-t border-[var(--border)] pt-4">
                 <PriceBreakdown seats={selectedSeats} discount={appliedDiscount} />
               </div>
             )}
@@ -245,7 +245,7 @@ function SeatStep({ event }: { event: EventSummary }) {
 
       {/* Expired modal */}
       <Modal isOpen={expired} onClose={() => {}} title="Session Expired">
-        <p className="mb-5 text-sm text-[#6B6B6B]">
+        <p className="mb-5 text-sm text-[var(--text-secondary)]">
           Your seat hold has expired. Please reselect your seats.
         </p>
         <Button variant="primary" size="md" className="w-full" onClick={handleReselect}>
@@ -289,10 +289,10 @@ function SeatButton({
       className={cn(
         "relative flex h-8 w-8 items-center justify-center rounded-[6px] text-[8px] transition-colors",
         isBooked
-          ? "cursor-not-allowed bg-[#EEEEEE] text-[#9B9B9B]"
+          ? "cursor-not-allowed bg-[#EEEEEE] text-[var(--text-muted)]"
           : isSelected
-          ? "neu-pressed border border-[#4F46E5] bg-[#EEF2FF] text-[#4F46E5]"
-          : "neu-raised bg-[#F5F5F7] text-[#6B6B6B] hover:bg-[#EAEEF2]",
+          ? "neu-pressed border border-[var(--accent-light)] bg-[#EEF2FF] text-[var(--accent-light)]"
+          : "neu-raised bg-[#f2e7da] text-[var(--text-secondary)] hover:bg-[#EAEEF2]",
       )}
     >
       {isBooked ? <X size={8} /> : isSelected ? <Check size={8} /> : null}
@@ -339,40 +339,40 @@ function ReviewStep({ event }: { event: EventSummary }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       {/* Order table */}
-      <div className="rounded-2xl border border-[#E4E4E7] overflow-hidden">
+      <div className="rounded-2xl border border-[var(--border)] overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-[#F5F5F7]">
+          <thead className="bg-[#f2e7da]">
             <tr>
-              <th className="px-4 py-3 text-left font-semibold text-[#0A0A0A]">Seat</th>
-              <th className="px-4 py-3 text-left font-semibold text-[#0A0A0A]">Category</th>
-              <th className="px-4 py-3 text-right font-semibold text-[#0A0A0A]">Price</th>
+              <th className="px-4 py-3 text-left font-semibold text-[var(--accent-dark)]">Seat</th>
+              <th className="px-4 py-3 text-left font-semibold text-[var(--accent-dark)]">Category</th>
+              <th className="px-4 py-3 text-right font-semibold text-[var(--accent-dark)]">Price</th>
             </tr>
           </thead>
           <tbody>
             {selectedSeats.map((s) => (
-              <tr key={s.seat_id} className="border-t border-[#E4E4E7]">
-                <td className="px-4 py-3 text-[#0A0A0A]">Seat {s.seat_number}</td>
-                <td className="px-4 py-3 text-[#6B6B6B]">{event.category?.category_name}</td>
-                <td className="px-4 py-3 text-right text-[#0A0A0A]">
+              <tr key={s.seat_id} className="border-t border-[var(--border)]">
+                <td className="px-4 py-3 text-[var(--accent-dark)]">Seat {s.seat_number}</td>
+                <td className="px-4 py-3 text-[var(--text-secondary)]">{event.category?.category_name}</td>
+                <td className="px-4 py-3 text-right text-[var(--accent-dark)]">
                   ₹{getSeatPrice(s.seat_number).toLocaleString("en-IN")}
                 </td>
               </tr>
             ))}
           </tbody>
-          <tfoot className="border-t-2 border-[#E4E4E7] bg-[#F5F5F7]">
+          <tfoot className="border-t-2 border-[var(--border)] bg-[#f2e7da]">
             <tr>
-              <td colSpan={2} className="px-4 py-2 text-[#6B6B6B]">Subtotal</td>
-              <td className="px-4 py-2 text-right text-[#0A0A0A]">₹{subtotal.toLocaleString("en-IN")}</td>
+              <td colSpan={2} className="px-4 py-2 text-[var(--text-secondary)]">Subtotal</td>
+              <td className="px-4 py-2 text-right text-[var(--accent-dark)]">₹{subtotal.toLocaleString("en-IN")}</td>
             </tr>
             <tr>
-              <td colSpan={2} className="px-4 py-2 text-[#6B6B6B]">
+              <td colSpan={2} className="px-4 py-2 text-[var(--text-secondary)]">
                 Convenience fee (₹{CONVENIENCE_FEE} × {selectedSeats.length})
               </td>
-              <td className="px-4 py-2 text-right text-[#0A0A0A]">₹{convFee.toLocaleString("en-IN")}</td>
+              <td className="px-4 py-2 text-right text-[var(--accent-dark)]">₹{convFee.toLocaleString("en-IN")}</td>
             </tr>
             <tr>
-              <td colSpan={2} className="px-4 py-2 text-[#6B6B6B]">GST (18%)</td>
-              <td className="px-4 py-2 text-right text-[#0A0A0A]">₹{gst.toFixed(2)}</td>
+              <td colSpan={2} className="px-4 py-2 text-[var(--text-secondary)]">GST (18%)</td>
+              <td className="px-4 py-2 text-right text-[var(--accent-dark)]">₹{gst.toFixed(2)}</td>
             </tr>
             {appliedDiscount && discountAmt > 0 && (
               <tr>
@@ -384,9 +384,9 @@ function ReviewStep({ event }: { event: EventSummary }) {
                 </td>
               </tr>
             )}
-            <tr className="border-t border-[#E4E4E7]">
-              <td colSpan={2} className="px-4 py-3 text-base font-bold text-[#0A0A0A]">Total</td>
-              <td className="px-4 py-3 text-right text-base font-bold text-[#0A0A0A]">
+            <tr className="border-t border-[var(--border)]">
+              <td colSpan={2} className="px-4 py-3 text-base font-bold text-[var(--accent-dark)]">Total</td>
+              <td className="px-4 py-3 text-right text-base font-bold text-[var(--accent-dark)]">
                 ₹{total.toLocaleString("en-IN")}
               </td>
             </tr>
@@ -395,8 +395,8 @@ function ReviewStep({ event }: { event: EventSummary }) {
       </div>
 
       {/* Discount code */}
-      <div className="rounded-2xl border border-[#E4E4E7] p-5">
-        <p className="mb-3 text-sm font-semibold text-[#0A0A0A]">Have a promo code?</p>
+      <div className="rounded-2xl border border-[var(--border)] p-5">
+        <p className="mb-3 text-sm font-semibold text-[var(--accent-dark)]">Have a promo code?</p>
         {appliedDiscount ? (
           <div className="flex items-center gap-2 rounded-xl bg-green-50 px-4 py-2.5 text-sm font-medium text-green-700">
             <Check size={15} />
@@ -432,8 +432,8 @@ function ReviewStep({ event }: { event: EventSummary }) {
       </div>
 
       {/* Contact details */}
-      <div className="rounded-2xl border border-[#E4E4E7] p-5">
-        <p className="mb-3 text-sm font-semibold text-[#0A0A0A]">Ticket details will be sent to:</p>
+      <div className="rounded-2xl border border-[var(--border)] p-5">
+        <p className="mb-3 text-sm font-semibold text-[var(--accent-dark)]">Ticket details will be sent to:</p>
         <div className="space-y-3">
           <Input
             label="Email"
@@ -450,7 +450,7 @@ function ReviewStep({ event }: { event: EventSummary }) {
             leadingIcon={<Phone size={14} />}
           />
         </div>
-        <a href="/profile/settings" className="mt-2 inline-block text-xs text-[#4F46E5] hover:underline">
+        <a href="/profile/settings" className="mt-2 inline-block text-xs text-[var(--accent-light)] hover:underline">
           Update in settings
         </a>
       </div>
@@ -461,7 +461,7 @@ function ReviewStep({ event }: { event: EventSummary }) {
         </Button>
         <button
           onClick={prevStep}
-          className="flex items-center justify-center gap-1 text-sm font-medium text-[#6B6B6B] hover:text-[#0A0A0A]"
+          className="flex items-center justify-center gap-1 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--accent-dark)]"
         >
           <ChevronLeft size={15} /> Back to Seat Selection
         </button>
@@ -494,7 +494,7 @@ export default function BookingClient({ event }: { event: EventSummary }) {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="font-display mb-6 text-2xl font-bold text-[#0A0A0A]">
+        <h1 className="font-display mb-6 text-2xl font-bold text-[var(--accent-dark)]">
           {event.event_name}
         </h1>
         <div className="flex items-center gap-4">
@@ -506,10 +506,10 @@ export default function BookingClient({ event }: { event: EventSummary }) {
                 className={cn(
                   "text-sm",
                   i + 1 === currentStep
-                    ? "font-semibold text-[#0A0A0A]"
+                    ? "font-semibold text-[var(--accent-dark)]"
                     : i + 1 < currentStep
-                    ? "text-[#4F46E5]"
-                    : "text-[#9B9B9B]",
+                    ? "text-[var(--accent-light)]"
+                    : "text-[var(--text-muted)]",
                 )}
               >
                 {label}

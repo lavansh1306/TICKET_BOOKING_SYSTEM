@@ -30,7 +30,7 @@ export default function AppProviders({ children }: AppProvidersProps) {
         toastOptions={{
           style: {
             background: "#111118",
-            color: "#F5F5F7",
+            color: "#f2e7da",
             border: "1px solid rgba(255,255,255,0.1)",
           },
         }}

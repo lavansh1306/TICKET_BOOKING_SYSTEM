@@ -195,7 +195,7 @@ export default function PaymentStep({ eventId, onSuccess }: PaymentStepProps) {
           {activeTab === "card" ? (
             <motion.div key="card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <div className="flex gap-6">
-                <div className="relative h-[200px] w-[340px] rounded-lg bg-[#1A1A2E] p-4 text-white">
+                <div className="relative h-[200px] w-[340px] rounded-lg bg-[var(--accent)] p-4 text-white">
                   <div className="absolute right-3 top-3 text-xs font-semibold">
                     {form.watch("cardNumber")?.trim().startsWith("4") ? "VISA" : form.watch("cardNumber")?.trim().startsWith("5") ? "MASTERCARD" : ""}
                   </div>
@@ -240,7 +240,7 @@ export default function PaymentStep({ eventId, onSuccess }: PaymentStepProps) {
                     <label className="neu-raised px-3 py-2"> 
                       <input type="checkbox" className="mr-2" /> Save this card for future bookings
                     </label>
-                    <div className="text-xs text-[#6B6B6B]">Pay ₹{total.toLocaleString("en-IN")}</div>
+                    <div className="text-xs text-[var(--text-secondary)]">Pay ₹{total.toLocaleString("en-IN")}</div>
                   </div>
 
                   <Button
@@ -270,15 +270,15 @@ export default function PaymentStep({ eventId, onSuccess }: PaymentStepProps) {
                   ["CAN", "Canara Bank"],
                 ].map(([abbr, name]) => (
                   <button key={abbr} className="neu-raised p-3 text-left" onClick={() => { setActiveTab("bank"); setShowBankRedirect(true); doTransaction({ bankName: String(name) }); }}>
-                    <div className="font-bold text-[#1A1A2E]">{abbr}</div>
-                    <div className="text-xs text-[#6B6B6B]">{name}</div>
+                    <div className="font-bold text-[var(--accent)]">{abbr}</div>
+                    <div className="text-xs text-[var(--text-secondary)]">{name}</div>
                   </button>
                 ))}
               </div>
 
-              <div className="mt-4 flex items-center justify-between text-sm text-[#6B6B6B]">
+              <div className="mt-4 flex items-center justify-between text-sm text-[var(--text-secondary)]">
                 <div className="flex items-center gap-2">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 1v2" stroke="#6B6B6B" strokeWidth="2"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 1v2" stroke="var(--text-secondary)" strokeWidth="2"/></svg>
                   <div> You will be redirected to your bank's secure portal to complete this payment.</div>
                 </div>
                 <Button onClick={() => doTransaction({ bankName: "Selected Bank" })}>Proceed to Bank →</Button>
@@ -289,8 +289,8 @@ export default function PaymentStep({ eventId, onSuccess }: PaymentStepProps) {
       </div>
 
       {/* Security footer */}
-      <div className="flex items-center gap-4 text-sm text-[#9B9B9B]">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 1v2" stroke="#9B9B9B" strokeWidth="2"/></svg>
+      <div className="flex items-center gap-4 text-sm text-[var(--text-muted)]">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 1v2" stroke="var(--text-muted)" strokeWidth="2"/></svg>
         <div>256-bit SSL Encrypted</div>
         <div className="ml-2">Powered by Razorpay</div>
       </div>
@@ -316,7 +316,7 @@ export default function PaymentStep({ eventId, onSuccess }: PaymentStepProps) {
             <div className="absolute inset-0 bg-black/50" />
             <div className="relative z-10 w-[420px] rounded-2xl bg-white p-6">
               <h3 className="text-xl font-semibold">Verify Payment</h3>
-              <p className="text-sm text-[#6B6B6B]">Enter the OTP sent to {maskedPhone}</p>
+              <p className="text-sm text-[var(--text-secondary)]">Enter the OTP sent to {maskedPhone}</p>
 
               <div className="mt-4 flex gap-2">
                 {Array.from({ length: 6 }).map((_, i) => (
@@ -343,9 +343,9 @@ export default function PaymentStep({ eventId, onSuccess }: PaymentStepProps) {
               {otpError && <p className="mt-2 text-sm text-red-600">{otpError}</p>}
 
               <div className="mt-4 flex items-center justify-between">
-                <div className="text-sm text-[#6B6B6B]">
+                <div className="text-sm text-[var(--text-secondary)]">
                   <CountdownTimer seconds={30} onComplete={() => {}} />
-                  <div className="text-xs text-[#6B6B6B]">(Demo OTP: 123456)</div>
+                  <div className="text-xs text-[var(--text-secondary)]">(Demo OTP: 123456)</div>
                 </div>
                 <div className="flex gap-2">
                   <button className="text-sm text-red-600" onClick={() => { setShowOTP(false); setLoadingText(null); }}>Cancel payment</button>

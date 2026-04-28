@@ -46,12 +46,12 @@ export default function AppNavbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 h-16 w-full border-b border-[#E4E4E7] bg-white">
+      <header className="sticky top-0 z-50 h-16 w-full border-b border-[var(--border)] bg-[var(--bg-secondary)]">
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
           {/* Wordmark */}
           <button
             onClick={() => router.push("/events")}
-            className="font-sans text-base font-bold tracking-widest text-[#0A0A0A]"
+            className="font-sans text-base font-bold tracking-widest text-[var(--accent-dark)]"
           >
             BOOKING_SYSTEM
           </button>
@@ -60,7 +60,7 @@ export default function AppNavbar() {
           <div ref={cityRef} className="relative hidden md:block">
             <button
               onClick={() => setCityOpen((o) => !o)}
-              className="neu-raised flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-[#0A0A0A]"
+              className="neu-raised flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-[var(--accent-dark)]"
             >
               {city}
               <ChevronDown size={14} className={`transition-transform ${cityOpen ? "rotate-180" : ""}`} />
@@ -72,13 +72,13 @@ export default function AppNavbar() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute left-1/2 top-full mt-2 w-40 -translate-x-1/2 overflow-hidden rounded-xl border border-[#E4E4E7] bg-white shadow-lg"
+                  className="absolute left-1/2 top-full mt-2 w-40 -translate-x-1/2 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] shadow-lg"
                 >
                   {CITIES.map((c) => (
                     <li key={c}>
                       <button
                         onClick={() => { setCity(c); setCityOpen(false); }}
-                        className={`w-full px-4 py-2.5 text-left text-sm hover:bg-[#F5F5F7] ${c === city ? "font-semibold text-[#0A0A0A]" : "text-[#6B6B6B]"}`}
+                        className={`w-full px-4 py-2.5 text-left text-sm hover:bg-[#f2e7da] ${c === city ? "font-semibold text-[var(--accent-dark)]" : "text-[var(--text-secondary)]"}`}
                       >
                         {c}
                       </button>
@@ -93,13 +93,13 @@ export default function AppNavbar() {
           <div className="flex items-center gap-2">
             {/* Search */}
             <button className="neu-raised flex h-9 w-9 items-center justify-center rounded-full">
-              <Search size={16} className="text-[#6B6B6B]" />
+              <Search size={16} className="text-[var(--text-secondary)]" />
             </button>
 
             {/* Bell */}
             <div className="relative">
               <button className="neu-raised flex h-9 w-9 items-center justify-center rounded-full">
-                <Bell size={16} className="text-[#6B6B6B]" />
+                <Bell size={16} className="text-[var(--text-secondary)]" />
               </button>
               <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#DC2626] text-[10px] font-bold text-white">
                 2
@@ -111,13 +111,13 @@ export default function AppNavbar() {
               <div className="hidden items-center gap-3 md:flex">
                 <button
                   onClick={() => router.push("/auth/login")}
-                  className="text-sm font-medium text-[#0A0A0A] hover:text-[#4F46E5]"
+                  className="text-sm font-medium text-[var(--accent-dark)] hover:text-[var(--accent)]"
                 >
                   Sign In
                 </button>
                 <button
                   onClick={() => router.push("/auth/register")}
-                  className="rounded-lg bg-[#1A1A2E] px-4 py-2 text-sm font-medium text-white hover:bg-[#0A0A0A]"
+                  className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[#FFF8F0] hover:bg-[var(--accent-strong)]"
                 >
                   Register
                 </button>
@@ -126,7 +126,7 @@ export default function AppNavbar() {
               <div ref={avatarRef} className="relative hidden md:block">
                 <button
                   onClick={() => setAvatarOpen((o) => !o)}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1A1A2E] text-xs font-bold text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent)] text-xs font-bold text-[#FFF8F0]"
                 >
                   {initials}
                 </button>
@@ -137,7 +137,7 @@ export default function AppNavbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -6 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-xl border border-[#E4E4E7] bg-white shadow-lg"
+                      className="absolute right-0 top-full mt-2 w-48 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-secondary)] shadow-lg"
                     >
                       {[
                         { label: "My Profile", href: "/profile" },
@@ -148,15 +148,15 @@ export default function AppNavbar() {
                         <button
                           key={href}
                           onClick={() => { router.push(href); setAvatarOpen(false); }}
-                          className="w-full px-4 py-2.5 text-left text-sm text-[#0A0A0A] hover:bg-[#F5F5F7]"
+                          className="w-full px-4 py-2.5 text-left text-sm text-[var(--accent-dark)] hover:bg-[#f2e7da]"
                         >
                           {label}
                         </button>
                       ))}
-                      <div className="my-1 border-t border-[#E4E4E7]" />
+                      <div className="my-1 border-t border-[var(--border)]" />
                       <button
                         onClick={signOut}
-                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#DC2626] hover:bg-[#F5F5F7]"
+                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#DC2626] hover:bg-[#f2e7da]"
                       >
                         Sign Out
                       </button>
@@ -171,7 +171,7 @@ export default function AppNavbar() {
               className="flex h-9 w-9 items-center justify-center rounded-full md:hidden"
               onClick={() => setMobileOpen(true)}
             >
-              <Menu size={20} className="text-[#0A0A0A]" />
+              <Menu size={20} className="text-[var(--accent-dark)]" />
             </button>
           </div>
         </div>
@@ -193,30 +193,30 @@ export default function AppNavbar() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30, duration: 0.4 }}
-              className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl bg-white px-6 pb-10 pt-4"
+              className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl border border-[var(--border)] bg-[var(--bg-secondary)] px-6 pb-10 pt-4"
             >
               <div className="mb-4 flex items-center justify-between">
-                <span className="font-sans text-sm font-bold tracking-widest text-[#0A0A0A]">BOOKING_SYSTEM</span>
+                <span className="font-sans text-sm font-bold tracking-widest text-[var(--accent-dark)]">BOOKING_SYSTEM</span>
                 <button onClick={() => setMobileOpen(false)}>
-                  <X size={20} className="text-[#6B6B6B]" />
+                  <X size={20} className="text-[var(--text-secondary)]" />
                 </button>
               </div>
 
               {/* City selector mobile */}
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#9B9B9B]">City</p>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">City</p>
               <div className="mb-4 flex flex-wrap gap-2">
                 {CITIES.map((c) => (
                   <button
                     key={c}
                     onClick={() => setCity(c)}
-                    className={`rounded-full px-3 py-1.5 text-sm ${c === city ? "bg-[#1A1A2E] text-white" : "bg-[#F5F5F7] text-[#6B6B6B]"}`}
+                    className={`rounded-full px-3 py-1.5 text-sm ${c === city ? "bg-[var(--accent)] text-[#FFF8F0]" : "bg-[#f2e7da] text-[var(--text-secondary)]"}`}
                   >
                     {c}
                   </button>
                 ))}
               </div>
 
-              <div className="border-t border-[#E4E4E7] pt-4">
+              <div className="border-t border-[var(--border)] pt-4">
                 {isAuthed ? (
                   <>
                     {[
@@ -228,7 +228,7 @@ export default function AppNavbar() {
                       <button
                         key={href}
                         onClick={() => { router.push(href); setMobileOpen(false); }}
-                        className="block w-full py-3 text-left text-sm font-medium text-[#0A0A0A]"
+                        className="block w-full py-3 text-left text-sm font-medium text-[var(--accent-dark)]"
                       >
                         {label}
                       </button>
@@ -244,13 +244,13 @@ export default function AppNavbar() {
                   <div className="flex flex-col gap-3">
                     <button
                       onClick={() => { router.push("/auth/login"); setMobileOpen(false); }}
-                      className="w-full rounded-lg border border-[#E4E4E7] py-3 text-sm font-medium text-[#0A0A0A]"
+                      className="w-full rounded-lg border border-[var(--border)] py-3 text-sm font-medium text-[var(--accent-dark)]"
                     >
                       Sign In
                     </button>
                     <button
                       onClick={() => { router.push("/auth/register"); setMobileOpen(false); }}
-                      className="w-full rounded-lg bg-[#1A1A2E] py-3 text-sm font-medium text-white"
+                      className="w-full rounded-lg bg-[var(--accent)] py-3 text-sm font-medium text-[#FFF8F0]"
                     >
                       Register
                     </button>

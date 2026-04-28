@@ -9,14 +9,14 @@ export default async function EventsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-      <h1 className="font-display mb-8 text-3xl font-bold text-[#0A0A0A]">All Events</h1>
+      <h1 className="font-display mb-8 text-3xl font-bold text-[var(--accent-dark)]">All Events</h1>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {events.map((event) => (
           <Link
             key={event.event_id}
             href={`/events/${event.event_id}`}
-            className="group rounded-2xl border border-[#E4E4E7] bg-white p-5 transition hover:shadow-md"
+            className="group rounded-2xl border border-[var(--border)] bg-white p-5 transition hover:shadow-md"
           >
             {/* Colour banner placeholder */}
             <div
@@ -30,11 +30,11 @@ export default async function EventsPage() {
               {event.category?.category_name}
             </Badge>
 
-            <h2 className="font-display mb-2 text-lg font-bold text-[#0A0A0A] group-hover:text-[#4F46E5]">
+            <h2 className="font-display mb-2 text-lg font-bold text-[var(--accent-dark)] group-hover:text-[var(--accent-light)]">
               {event.event_name}
             </h2>
 
-            <div className="space-y-1 text-sm text-[#6B6B6B]">
+            <div className="space-y-1 text-sm text-[var(--text-secondary)]">
               <p className="flex items-center gap-1.5">
                 <MapPin size={13} />
                 {event.venue?.venue_name}, {event.venue?.location}
@@ -46,8 +46,8 @@ export default async function EventsPage() {
             </div>
 
             <div className="mt-4 flex items-center justify-between">
-              <span className="text-sm font-semibold text-[#1A1A2E]">From ₹150</span>
-              <span className="text-xs font-medium text-[#4F46E5] group-hover:underline">
+              <span className="text-sm font-semibold text-[var(--accent)]">From ₹150</span>
+              <span className="text-xs font-medium text-[var(--accent-light)] group-hover:underline">
                 View details →
               </span>
             </div>

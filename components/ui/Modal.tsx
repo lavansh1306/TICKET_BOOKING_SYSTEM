@@ -44,7 +44,7 @@ export default function Modal({ isOpen, onClose, title, children, className }: M
             role="dialog"
             aria-modal="true"
             className={cn(
-              "w-full rounded-t-3xl bg-white p-5 shadow-2xl sm:max-w-xl sm:rounded-2xl",
+              "w-full rounded-t-3xl border border-[var(--border)] bg-[var(--bg-secondary)] p-5 shadow-2xl sm:max-w-xl sm:rounded-2xl",
               className,
             )}
             initial={{ y: 40, opacity: 0 }}
@@ -58,7 +58,7 @@ export default function Modal({ isOpen, onClose, title, children, className }: M
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
+                className="rounded-lg p-2 text-[var(--text-secondary)] transition hover:bg-[#f2e7da] hover:text-[var(--accent-dark)]"
                 aria-label="Close modal"
               >
                 <X className="h-5 w-5" />
