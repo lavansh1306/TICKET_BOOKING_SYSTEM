@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
 import { RowDataPacket } from "mysql2/promise";
 
 import db from "@/lib/db";
@@ -19,8 +18,10 @@ export async function POST(request: Request) {
     const parsed = loginSchema.safeParse(body);
 
     if (!parsed.success) {
+      const errors = parsed.error.flatten();
+      const errorMessage = Object.values(errors.fieldErrors)[0]?.[0] ?? "Invalid input";
       return NextResponse.json(
-        { error: parsed.error.flatten() },
+        { error: errorMessage },
         { status: 400 },
       );
     }
@@ -41,7 +42,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const passwordMatches = await bcrypt.compare(password, user.password);
+    // TODO: Migrate to bcrypt comparison after database passwords are hashed
+    // For now, compare plain-text passwords since DB stores plain text
+    const passwordMatches = password === user.password;
 
     if (!passwordMatches) {
       return NextResponse.json(

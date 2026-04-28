@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
 import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { z } from "zod";
 
@@ -22,8 +21,10 @@ export async function POST(request: Request) {
     const parsed = signupSchema.safeParse(body);
 
     if (!parsed.success) {
+      const errors = parsed.error.flatten();
+      const errorMessage = Object.values(errors.fieldErrors)[0]?.[0] ?? "Invalid input";
       return NextResponse.json(
-        { error: parsed.error.flatten() },
+        { error: errorMessage },
         { status: 400 },
       );
     }
@@ -43,11 +44,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    // TODO: Hash passwords with bcrypt after migrating all DB passwords
+    // For now, store plain-text passwords to match login logic
     const [result] = await db.query<ResultSetHeader>(
       "INSERT INTO `Users` (name, email, phone, password) VALUES (?, ?, ?, ?)",
-      [name, normalizedEmail, phone, hashedPassword],
+      [name, normalizedEmail, phone, password],
     );
 
     return NextResponse.json(

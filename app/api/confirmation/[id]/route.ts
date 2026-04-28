@@ -1,68 +1,215 @@
 import { NextResponse } from "next/server";
-import { events, users, venues } from "@/lib/mock";
+import { RowDataPacket } from "mysql2/promise";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
-  const id = Number(params.id);
+import db from "@/lib/db";
 
-  if (Number.isNaN(id) || id <= 0) {
-    return NextResponse.json({ error: "Invalid booking id" }, { status: 400 });
+interface BookingRow extends RowDataPacket {
+  booking_id: number;
+  user_id: number;
+  event_id: number;
+  booking_date: string;
+}
+
+interface TicketRow extends RowDataPacket {
+  ticket_id: number;
+  booking_id: number;
+  seat_id: number;
+  event_id: number;
+  qr_code: string;
+}
+
+interface PaymentRow extends RowDataPacket {
+  payment_id: number;
+  booking_id: number;
+  amount: number;
+  payment_method: string;
+  status: string;
+}
+
+interface EventRow extends RowDataPacket {
+  event_id: number;
+  event_name: string;
+  event_date: string;
+  venue_id: number;
+}
+
+interface VenueRow extends RowDataPacket {
+  venue_id: number;
+  venue_name: string;
+  location: string;
+}
+
+interface UserRow extends RowDataPacket {
+  user_id: number;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+interface SeatRow extends RowDataPacket {
+  seat_id: number;
+  seat_number: string;
+}
+
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const bookingId = Number(id);
+
+    if (Number.isNaN(bookingId) || bookingId <= 0) {
+      return NextResponse.json(
+        { error: "Invalid booking id" },
+        { status: 400 }
+      );
+    }
+
+    // Query booking details
+    const [bookings] = await db.query<BookingRow[]>(
+      "SELECT booking_id, user_id, event_id, booking_date FROM Booking WHERE booking_id = ? LIMIT 1",
+      [bookingId]
+    );
+
+    const booking = bookings[0];
+
+    if (!booking) {
+      return NextResponse.json(
+        { error: "Booking not found" },
+        { status: 404 }
+      );
+    }
+
+    // Query tickets for this booking
+    const [tickets] = await db.query<TicketRow[]>(
+      "SELECT ticket_id, booking_id, seat_id, event_id, qr_code FROM Ticket WHERE booking_id = ?",
+      [bookingId]
+    );
+
+    // Query payment for this booking
+    const [payments] = await db.query<PaymentRow[]>(
+      "SELECT payment_id, booking_id, amount, payment_method, status FROM Payment WHERE booking_id = ? LIMIT 1",
+      [bookingId]
+    );
+
+    const payment = payments[0];
+
+    if (!payment) {
+      return NextResponse.json(
+        { error: "Payment information not found" },
+        { status: 404 }
+      );
+    }
+
+    // Query event details
+    const [events] = await db.query<EventRow[]>(
+      "SELECT event_id, event_name, event_date, venue_id FROM Event WHERE event_id = ? LIMIT 1",
+      [booking.event_id]
+    );
+
+    const event = events[0];
+
+    if (!event) {
+      return NextResponse.json(
+        { error: "Event details not found" },
+        { status: 404 }
+      );
+    }
+
+    // Query venue details
+    const [venues] = await db.query<VenueRow[]>(
+      "SELECT venue_id, venue_name, location FROM Venue WHERE venue_id = ? LIMIT 1",
+      [event.venue_id]
+    );
+
+    const venue = venues[0];
+
+    if (!venue) {
+      return NextResponse.json(
+        { error: "Venue details not found" },
+        { status: 404 }
+      );
+    }
+
+    // Query user details
+    const [users] = await db.query<UserRow[]>(
+      "SELECT user_id, name, email, phone FROM Users WHERE user_id = ? LIMIT 1",
+      [booking.user_id]
+    );
+
+    const user = users[0];
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "User details not found" },
+        { status: 404 }
+      );
+    }
+
+    // Query seat numbers for all tickets
+    // Query seat numbers for all tickets
+    let seats: SeatRow[] = [];
+    if (tickets.length > 0) {
+      const seatIds = tickets.map((t) => t.seat_id);
+      const placeholders = seatIds.map(() => "?").join(",");
+      const [seatResults] = await db.query<SeatRow[]>(
+        `SELECT seat_id, seat_number FROM Seat WHERE seat_id IN (${placeholders}) AND event_id = ?`,
+        [...seatIds, booking.event_id]
+      );
+      seats = seatResults;
+    }
+
+    const seatMap = seats.reduce(
+      (acc, seat) => {
+        acc[seat.seat_id] = seat.seat_number;
+        return acc;
+      },
+      {} as Record<number, string>
+    );
+
+    const ticketData = tickets.map((ticket) => ({
+      ticket_id: ticket.ticket_id,
+      qr_code: ticket.qr_code,
+      seat_number: seatMap[ticket.seat_id] || `Seat ${ticket.seat_id}`,
+    }));
+
+    const seatLabels = tickets.map((t) => seatMap[t.seat_id] || `Seat ${t.seat_id}`);
+
+    const payload = {
+      booking: {
+        booking_id: booking.booking_id,
+        booking_date: booking.booking_date,
+      },
+      event: {
+        event_name: event.event_name,
+        event_date: event.event_date,
+      },
+      venue: {
+        venue_name: venue.venue_name,
+        location: venue.location,
+      },
+      payment: {
+        amount: payment.amount,
+        payment_method: payment.payment_method,
+        status: payment.status,
+      },
+      user: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+      },
+      tickets: ticketData,
+      seatLabels,
+      totalSeats: tickets.length,
+    };
+
+    return NextResponse.json({ data: payload }, { status: 200 });
+  } catch (error) {
+    console.error("Confirmation API error:", error);
+    return NextResponse.json(
+      { error: "Unable to fetch booking details" },
+      { status: 500 }
+    );
   }
-
-  // Build a richer mock response that varies with the booking id.
-  const user = users[(id - 1) % users.length];
-  const event = events[(id - 1) % events.length];
-  const venue = venues.find((item) => item.venue_id === event.venue_id)!;
-
-  const seatCount = 2 + ((id - 1) % 3);
-  const row = String.fromCharCode(65 + ((id - 1) % 5));
-  const seats = Array.from({ length: seatCount }, (_, index) => `${row}${((id + index) % 9) + 1}`);
-
-  const bookingDate = new Date();
-  bookingDate.setDate(bookingDate.getDate() - ((id - 1) % 4));
-
-  const amount = seatCount * 799 + 118;
-  const paymentMethods = ["Credit Card", "UPI", "Net Banking", "Wallet"];
-
-  const booking = {
-    booking_id: id,
-    booking_date: bookingDate.toISOString().split("T")[0],
-    event_id: event.event_id,
-    user_id: user.user_id,
-  };
-
-  const tickets = seats.map((seatNumber, index) => ({
-    ticket_id: id * 100 + index + 1,
-    qr_code: `QR-${id}-${user.user_id}-${seatNumber}`,
-    seat_number: seatNumber,
-  }));
-
-  const payload = {
-    booking: {
-      booking_id: booking.booking_id,
-      booking_date: booking.booking_date,
-    },
-    event: {
-      event_name: event.event_name,
-      event_date: event.event_date,
-    },
-    venue: {
-      venue_name: venue.venue_name,
-      location: venue.location,
-    },
-    payment: {
-      amount,
-      payment_method: paymentMethods[(id - 1) % paymentMethods.length],
-      status: "Completed",
-    },
-    user: {
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-    },
-    tickets,
-    seatLabels: seats,
-    totalSeats: seatCount,
-  };
-
-  return NextResponse.json({ data: payload }, { status: 200 });
 }
