@@ -482,6 +482,7 @@ const slideVariants = {
 
 export default function BookingClient({ event }: { event: EventSummary }) {
   const { currentStep } = useBookingFlow();
+  const router = useRouter();
   const prevStepRef = useRef(currentStep);
   const dir = currentStep > prevStepRef.current ? 1 : -1;
 
