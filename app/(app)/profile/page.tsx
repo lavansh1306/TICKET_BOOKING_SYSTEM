@@ -38,6 +38,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) return;
     let active = true;
 
     async function load() {
@@ -58,10 +59,8 @@ export default function ProfilePage() {
     }
 
     load();
-    return () => {
-      active = false;
-    };
-  }, []);
+    return () => { active = false; };
+  }, [user]);
 
   const metrics = useMemo(() => {
     const now = new Date();
@@ -74,8 +73,7 @@ export default function ProfilePage() {
         ? (myReviews.reduce((sum, review) => sum + review.rating, 0) / myReviews.length).toFixed(1)
         : "0.0";
 
-    // Mock spend model: each attended event counts as 2 seats x 799.
-    const spend = myEvents.length * 2 * 799;
+    const spend = 0; // real spend is shown on the Bookings page
 
     return {
       attended: myEvents.length,

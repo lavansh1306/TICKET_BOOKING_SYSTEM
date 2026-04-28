@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
+import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { z } from "zod";
-import { reviews } from "@/lib/mock";
+import db from "@/lib/db";
+
+interface ReviewRow extends RowDataPacket {
+  review_id: number;
+  user_id: number;
+  event_id: number;
+  rating: number;
+  comment: string;
+  user_name: string;
+}
 
 const reviewSchema = z.object({
   user_id: z.number().int().positive(),
@@ -10,7 +20,23 @@ const reviewSchema = z.object({
 });
 
 export async function GET() {
-  return NextResponse.json({ data: reviews });
+  const [rows] = await db.query<ReviewRow[]>(
+    `SELECT r.review_id, r.user_id, r.event_id, r.rating, r.comment, u.name AS user_name
+     FROM Review r
+     JOIN Users u ON u.user_id = r.user_id
+     ORDER BY r.review_id DESC`
+  );
+
+  const data = rows.map((r) => ({
+    review_id: r.review_id,
+    user_id: r.user_id,
+    event_id: r.event_id,
+    rating: r.rating,
+    comment: r.comment,
+    user: { name: r.user_name },
+  }));
+
+  return NextResponse.json({ data });
 }
 
 export async function POST(req: Request) {
@@ -22,13 +48,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 });
     }
 
-    const newReview = {
-      review_id: reviews.length + 1,
-      ...parsed.data,
-    };
+    const { user_id, event_id, rating, comment } = parsed.data;
 
-    // In production this would INSERT into DB; mock just returns the new review
-    return NextResponse.json({ data: newReview }, { status: 201 });
+    const [result] = await db.query<ResultSetHeader>(
+      "INSERT INTO Review (user_id, event_id, rating, comment) VALUES (?, ?, ?, ?)",
+      [user_id, event_id, rating, comment]
+    );
+
+    return NextResponse.json(
+      { data: { review_id: result.insertId, user_id, event_id, rating, comment } },
+      { status: 201 }
+    );
   } catch {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }

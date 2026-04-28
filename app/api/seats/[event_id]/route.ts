@@ -1,5 +1,14 @@
 import { NextResponse } from "next/server";
-import { events, seats } from "@/lib/mock";
+import { RowDataPacket } from "mysql2/promise";
+import db from "@/lib/db";
+
+interface EventRow extends RowDataPacket { venue_id: number; }
+interface SeatRow extends RowDataPacket {
+  seat_id: number;
+  seat_number: string;
+  venue_id: number;
+  is_booked: number;
+}
 
 interface Context {
   params: Promise<{ event_id: string }>;
@@ -13,16 +22,33 @@ export async function GET(_: Request, { params }: Context) {
     return NextResponse.json({ error: "Invalid event id" }, { status: 400 });
   }
 
-  const event = events.find((e) => e.event_id === eventId);
-  if (!event) {
+  const [eventRows] = await db.query<EventRow[]>(
+    "SELECT venue_id FROM Event WHERE event_id = ? LIMIT 1",
+    [eventId]
+  );
+
+  if (!eventRows[0]) {
     return NextResponse.json({ error: "Event not found" }, { status: 404 });
   }
 
-  // Mock: no tickets booked yet — all seats available
-  const data = seats
-    .filter((s) => s.venue_id === event.venue_id)
-    .map((s) => ({ ...s, status: "available" as const }))
-    .sort((a, b) => a.seat_number.localeCompare(b.seat_number));
+  const { venue_id } = eventRows[0];
+
+  const [seats] = await db.query<SeatRow[]>(
+    `SELECT s.seat_id, s.seat_number, s.venue_id,
+       CASE WHEN t.ticket_id IS NOT NULL THEN 1 ELSE 0 END AS is_booked
+     FROM Seat s
+     LEFT JOIN Ticket t ON t.seat_id = s.seat_id AND t.event_id = ?
+     WHERE s.venue_id = ?
+     ORDER BY s.seat_number ASC`,
+    [eventId, venue_id]
+  );
+
+  const data = seats.map((s) => ({
+    seat_id: s.seat_id,
+    seat_number: s.seat_number,
+    venue_id: s.venue_id,
+    status: s.is_booked ? "booked" : "available",
+  }));
 
   return NextResponse.json({ data });
 }
