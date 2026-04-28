@@ -3,21 +3,45 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --text-primary: #0a0a0a;
+  --text-secondary: #6b6b6b;
+  --text-muted: #9b9b9b;
+  --accent: #1a1a2e;
+  --accent-light: #4f46e5;
+  --border: #e4e4e7;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --neu-base: #f5f5f7;
+  --neu-dark: #d1d9e6;
+  --neu-light: #ffffff;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  font-family: var(--font-inter), Inter, sans-serif;
+}
+
+.neu-raised {
+  background: var(--neu-base);
+  box-shadow: 6px 6px 12px var(--neu-dark), -6px -6px 12px var(--neu-light);
+  border-radius: 10px;
+  border: none;
+}
+
+.neu-pressed {
+  background: #eaeef2;
+  box-shadow: inset 4px 4px 8px var(--neu-dark), inset -4px -4px 8px var(--neu-light);
+}
+
+.glass-dark {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
 @layer utilities {
