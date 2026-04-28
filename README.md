@@ -1,507 +1,346 @@
 <div align="center">
 
-# 🎟️ TICKET BOOKING SYSTEM
+# BOOKING_SYSTEM
 
-### A premium, full-stack event ticketing platform built with Next.js 15 App Router
+### A production-grade full-stack event ticketing platform
 
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
-[![MySQL](https://img.shields.io/badge/MySQL-3-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com)
-[![Zustand](https://img.shields.io/badge/Zustand-5-orange?style=for-the-badge)](https://zustand-demo.pmnd.rs)
-[![Framer Motion](https://img.shields.io/badge/Framer_Motion-12-0055FF?style=for-the-badge&logo=framer&logoColor=white)](https://www.framer.com/motion)
-[![GSAP](https://img.shields.io/badge/GSAP-3-88CE02?style=for-the-badge&logo=greensock&logoColor=white)](https://gsap.com)
-[![Zod](https://img.shields.io/badge/Zod-4-3E67B1?style=for-the-badge)](https://zod.dev)
-[![React Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?style=for-the-badge&logo=react-query&logoColor=white)](https://tanstack.com/query)
-[![NextAuth](https://img.shields.io/badge/NextAuth.js-5_beta-purple?style=for-the-badge)](https://authjs.dev)
-[![Three.js](https://img.shields.io/badge/Three.js-0.184-black?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org)
+**Next.js 16 · TypeScript 5 · MariaDB · Framer Motion · GSAP · Three.js**
 
 </div>
 
 ---
 
-## 📋 Table of Contents
+## Overview
 
-- [Overview](#-overview)
-- [Architecture](#-architecture)
-- [Tech Stack](#-tech-stack)
-- [Features](#-features)
-- [Project Structure](#-project-structure)
-- [Data Models](#-data-models)
-- [API Reference](#-api-reference)
-- [Booking Flow](#-booking-flow)
-- [State Management](#-state-management)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [Scripts](#-scripts)
+BOOKING_SYSTEM is a full-stack event ticket booking platform built as a DBMS course project at SRM IST. It covers the complete booking lifecycle — event discovery, interactive seat selection, discount validation, payment processing, and QR ticket generation — backed by a real relational MariaDB database with proper transaction handling and concurrency control.
+
+Every API route reads from and writes to the live database. No mock data is served in production paths.
 
 ---
 
-## 🌟 Overview
+## Tech Stack
 
-**TICKET_BOOKING_SYSTEM** is a production-grade event ticket booking platform that lets users discover events, choose seats on an interactive seat map, apply discount codes, and complete a secure multi-step payment checkout. The system enforces double-booking protection, real-time seat availability, OTP-verified payments, and post-event reviews — all wrapped in a silky-smooth animated UI.
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        CLIENT (Browser)                         │
-│                                                                 │
-│  ┌─────────────┐  ┌──────────────────┐  ┌───────────────────┐  │
-│  │  Landing    │  │  Event Discovery │  │   Booking Flow    │  │
-│  │  Page       │  │  /events         │  │   (3-step wizard) │  │
-│  │  (GSAP +    │  │  /events/[id]    │  │                   │  │
-│  │  Framer)    │  │                  │  │  1. Seat Select   │  │
-│  └─────────────┘  └──────────────────┘  │  2. Discount      │  │
-│                                         │  3. Payment       │  │
-│                                         └───────────────────┘  │
-│                                                                 │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │                Zustand Global State                       │  │
-│  │   useBookingStore (seats, step, discount, totals)         │  │
-│  │   useUserStore    (auth user session)                     │  │
-│  └───────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │            TanStack Query  (server cache)                 │  │
-│  └───────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
-                              │  HTTP / API Routes
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                  Next.js App Router  (Server)                   │
-│                                                                 │
-│  Route Handlers (app/api/*)                                     │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐ │
-│  │ /api/auth    │ │ /api/events  │ │ /api/booking             │ │
-│  │   login      │ │   GET list   │ │   POST create booking    │ │
-│  │   signup     │ │   GET [id]   │ │   GET user bookings      │ │
-│  │   [...next]  │ │              │ └──────────────────────────┘ │
-│  └──────────────┘ └──────────────┘                             │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐ │
-│  │ /api/payment │ │ /api/seats   │ │ /api/discount            │ │
-│  │   POST pay   │ │   GET map    │ │   POST validate code     │ │
-│  └──────────────┘ └──────────────┘ └──────────────────────────┘ │
-│                                                                 │
-│  Zod Validation Layer ─────────────────────────────────────────│
-│  (auth.ts · booking.ts · payment.ts)                            │
-│                                                                 │
-│  Query Layer (lib/queries/*)                                    │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐ │
-│  │ events.ts    │ │ booking.ts   │ │ user.ts / payment.ts     │ │
-│  └──────────────┘ └──────────────┘ └──────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      Data Layer                                 │
-│                                                                 │
-│   MySQL  (mysql2/promise · connection pool)                     │
-│   ┌─────────────────────────────────────────────────────────┐   │
-│   │  Users · Events · Venues · Seats · Bookings             │   │
-│   │  Payments · Tickets · Reviews · Discounts · Artists     │   │
-│   └─────────────────────────────────────────────────────────┘   │
-│                                                                 │
-│   Mock Layer (lib/mock/) — used in development / demo mode      │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology | Purpose |
+| Layer | Technology | Version |
 |---|---|---|
-| **Framework** | Next.js 16 (App Router) | Full-stack React framework, SSR + API routes |
-| **Language** | TypeScript 5 | End-to-end type safety |
-| **Styling** | Tailwind CSS 3 | Utility-first CSS |
-| **Animation** | Framer Motion 12 | Page transitions, scroll effects, hover physics |
-| **Animation** | GSAP 3 + SplitText | Hero text animations, scroll-driven sequences |
-| **3D** | Three.js 0.184 | 3D ticket confirmation card |
-| **State** | Zustand 5 | Booking wizard + auth global state |
-| **Data Fetching** | TanStack Query 5 | Server state cache, loading/error handling |
-| **Auth** | NextAuth.js v5 beta | Session management, credential + OAuth |
-| **Forms** | React Hook Form 7 + Zod 4 | Schema validation on forms and API routes |
-| **Database** | MySQL 2 + mysql2/promise | Relational data, connection pooling |
-| **Password** | bcrypt 6 | Secure password hashing |
-| **Notifications** | react-hot-toast 2 | Toast notifications |
-| **Icons** | Lucide React 1 | Icon library |
+| Framework | Next.js App Router | 16.2.4 |
+| Language | TypeScript | 5 |
+| Styling | Tailwind CSS | 3.4 |
+| Animation | Framer Motion | 12.38 |
+| Animation | GSAP + SplitText + ScrollTrigger | 3.15 |
+| 3D | Three.js | 0.184 |
+| State | Zustand | 5 |
+| Server State | TanStack Query | 5 |
+| Auth | NextAuth.js v5 beta | 5.0.0-beta.31 |
+| Forms | React Hook Form + Zod | 7 + 4 |
+| Database | MariaDB via mysql2/promise | 3.22 |
+| Password | bcrypt | 6 |
+| Icons | Lucide React | 1.11 |
+| Notifications | react-hot-toast | 2.6 |
 
 ---
 
-## ✨ Features
+## Database Schema
 
-| Feature | Description |
-|---|---|
-| 🎭 **Event Discovery** | Browse concerts, movies, sports, festivals and theatre events |
-| 🗺️ **Interactive Seat Map** | Row-based seat grid with real-time availability and pricing tiers |
-| 💳 **Multi-step Checkout** | 3-step booking wizard: Seats → Discount → Payment |
-| 🔖 **Discount Codes** | Promo codes validated against expiry date with live price recalculation |
-| 🔐 **Auth System** | Register & login with email/password; NextAuth session management |
-| 🛡️ **Double-booking Guard** | `UNIQUE(seat_id, event_id)` constraint prevents concurrent seat conflicts |
-| 🎟️ **3D Ticket** | Animated Three.js confirmation ticket on booking success |
-| ⭐ **Event Reviews** | Post-event 1–5 star ratings with comments |
-| 💰 **Tiered Pricing** | Seat price by row prefix (A=₹500 → E=₹150) + GST + convenience fee |
-| 📱 **Responsive UI** | Mobile-first layout using Tailwind CSS breakpoints |
-| 🎨 **Premium Design** | Warm earth-tone palette, glassmorphism cards, floating parallax cards |
-
----
-
-## 📁 Project Structure
+18 tables in MariaDB. All API routes query these directly.
 
 ```
-TICKET_BOOKING_SYSTEM/
-├── app/                          # Next.js App Router
-│   ├── layout.tsx                # Root layout (fonts, providers)
-│   ├── page.tsx                  # Landing page (Hero, Stats, Features, HowItWorks)
+Users          — user_id, name, email, phone, password
+Event          — event_id, event_name, event_date, venue_id, category_id, organizer_id, admin_id
+Venue          — venue_id, venue_name, location, capacity
+Category       — category_id, category_name
+Organizer      — organizer_id, name, contact
+Artist         — artist_id, artist_name, genre
+Event_Artist   — event_id, artist_id  (junction)
+Seat           — seat_id, seat_number, venue_id
+Booking        — booking_id, user_id, event_id, booking_date
+Ticket         — ticket_id, booking_id, seat_id, event_id, qr_code
+Payment        — payment_id, booking_id, amount, payment_method, status
+Discount       — discount_id, code, percentage, expiry_date
+Booking_Discount — booking_id, discount_id  (junction)
+Review         — review_id, user_id, event_id, rating, comment
+Admin          — admin table
+Seat_Lock      — concurrency seat locking
+Booking_View   — DB view for booking summaries
+Revenue_View   — DB view for revenue reporting
+```
+
+**Double-booking protection** is enforced at the database level. `/api/book-ticket` opens a transaction, runs `SELECT ... FOR UPDATE` on each seat before inserting, and rolls back the entire transaction if any seat is already taken.
+
+---
+
+## Project Structure
+
+```
+booking-system/
+├── app/
+│   ├── (app)/                        # Authenticated app shell
+│   │   ├── events/
+│   │   │   ├── page.tsx              # SSR event list (getEvents → DB)
+│   │   │   ├── EventsPageClient.tsx  # Animated grid, category filter
+│   │   │   └── [event_id]/
+│   │   │       ├── page.tsx          # SSR event detail (getEventDetails → DB)
+│   │   │       └── EventDetailClient.tsx
+│   │   ├── booking/[event_id]/
+│   │   │   ├── page.tsx
+│   │   │   └── BookingClient.tsx     # 3-step wizard (Seats → Review → Payment)
+│   │   ├── confirmation/[booking_id]/
+│   │   │   └── page.tsx              # Ticket confirmation + Three.js 3D card
+│   │   └── profile/
+│   │       ├── page.tsx              # GSAP counter metrics, real booking data
+│   │       ├── bookings/page.tsx     # Real bookings from DB
+│   │       ├── reviews/page.tsx      # Real reviews from DB
+│   │       └── settings/page.tsx     # PATCH user in DB
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── login/route.ts        # POST — queries Users table, plain-text compare
+│   │   │   └── signup/route.ts       # POST — INSERT into Users, duplicate check
+│   │   ├── events/
+│   │   │   ├── route.ts              # GET — JOIN Event+Venue+Category+Organizer
+│   │   │   └── [id]/route.ts         # GET — single event
+│   │   ├── seats/[event_id]/route.ts # GET — LEFT JOIN Seat+Ticket for live status
+│   │   ├── book-ticket/route.ts      # POST — full transaction: Booking+Ticket+Payment
+│   │   ├── confirmation/[id]/route.ts# GET — 6-table JOIN for ticket confirmation
+│   │   ├── discount/route.ts         # GET/POST — queries Discount table
+│   │   ├── booking-discount/route.ts # POST — INSERT into Booking_Discount
+│   │   ├── review/route.ts           # GET/POST — Review table
+│   │   ├── payment/route.ts          # POST — INSERT into Payment
+│   │   ├── booking/route.ts          # POST — INSERT into Booking
+│   │   ├── ticket/route.ts           # GET/POST — Ticket table
+│   │   └── profile/
+│   │       ├── [user_id]/route.ts    # GET/PATCH — Users table
+│   │       └── [user_id]/bookings/   # GET — full booking history JOIN
 │   ├── auth/
-│   │   ├── login/                # Login page
-│   │   └── register/             # Registration page
-│   ├── payment/                  # Payment page
-│   └── api/                      # Route Handlers
-│       ├── auth/
-│       │   ├── [...nextauth]/    # NextAuth handler
-│       │   ├── login/            # POST /api/auth/login
-│       │   └── signup/           # POST /api/auth/signup
-│       ├── events/
-│       │   ├── route.ts          # GET /api/events
-│       │   └── [id]/route.ts     # GET /api/events/:id
-│       ├── booking/route.ts      # POST /api/booking
-│       ├── booking-discount/     # POST apply discount to booking
-│       ├── confirmation/         # GET booking confirmation
-│       ├── discount/             # POST /api/discount (validate code)
-│       ├── payment/route.ts      # POST /api/payment
-│       ├── profile/              # GET /api/profile
-│       ├── review/               # POST /api/review
-│       ├── seats/                # GET /api/seats
-│       ├── ticket/               # GET /api/ticket
-│       └── book-ticket/          # POST full book-ticket flow
-│
+│   │   ├── login/page.tsx            # Split-screen, floating cards, success burst
+│   │   └── register/page.tsx         # Step timeline, confetti celebration
+│   └── page.tsx                      # Landing page
 ├── components/
 │   ├── landing/
-│   │   ├── HeroSection.tsx       # Animated hero with floating event cards
-│   │   ├── FeaturesSection.tsx   # Sticky scroll feature list
-│   │   ├── HowItWorksSection.tsx # Step-by-step explainer
-│   │   ├── StatsSection.tsx      # Key platform stats
-│   │   └── LandingNav.tsx        # Landing page navigation
-│   ├── layout/
-│   │   ├── AppNavbar.tsx         # Authenticated app navbar
-│   │   ├── AppFooter.tsx         # App footer
-│   │   └── Footer.tsx            # Landing footer
-│   ├── payment/
-│   │   └── PaymentStep.tsx       # Payment form step
+│   │   ├── HeroSection.tsx           # GSAP SplitText, Framer 3D floating cards
+│   │   ├── StatsSection.tsx          # GSAP ScrollTrigger counter animation
+│   │   ├── FeaturesSection.tsx       # Framer whileInView stagger
+│   │   └── HowItWorksSection.tsx     # GSAP horizontal scroll pin
 │   ├── confirmation/
-│   │   └── Ticket3D.tsx          # Three.js 3D ticket card
-│   ├── shared/
-│   │   ├── AppProviders.tsx      # TanStack Query + auth providers
-│   │   └── RoutePlaceholder.tsx  # Loading placeholder
-│   └── ui/
-│       ├── Button.tsx            # Reusable button variants
-│       ├── Card.tsx              # Card container
-│       ├── Input.tsx             # Form input
-│       ├── Modal.tsx             # Dialog/modal
-│       ├── Badge.tsx             # Status badge
-│       ├── StepIndicator.tsx     # Booking wizard step dots
-│       ├── CountdownTimer.tsx    # Event countdown
-│       └── SkeletonLoader.tsx    # Loading skeleton
-│
+│   │   └── Ticket3D.tsx              # Three.js rotating ticket card
+│   ├── layout/
+│   │   ├── AppNavbar.tsx             # Scroll-aware compression, spring interactions
+│   │   └── AppFooter.tsx
+│   ├── payment/
+│   │   └── PaymentStep.tsx
+│   └── shared/
+│       └── PageTransition.tsx        # Route-level fade transition
 ├── lib/
-│   ├── db.ts                     # MySQL connection pool
-│   ├── hooks/
-│   │   ├── useBookingFlow.ts     # Booking wizard navigation hook
-│   │   └── useSeatMap.ts         # Seat selection state hook
-│   ├── mock/
-│   │   └── index.ts              # Mock data (events, seats, users, etc.)
+│   ├── db.ts                         # mysql2 connection pool (limit: 10)
 │   ├── queries/
-│   │   ├── events.ts             # Event data queries
-│   │   ├── booking.ts            # Booking + discount helpers
-│   │   ├── payment.ts            # Payment queries
-│   │   └── user.ts               # User queries
+│   │   ├── events.ts                 # getEvents, getEventById, getEventDetails
+│   │   ├── booking.ts                # findDiscountByCode (DB), calcPricing
+│   │   ├── payment.ts                # payment helpers
+│   │   └── user.ts                   # getUserById, getUserByEmail
 │   ├── store/
-│   │   ├── bookingStore.ts       # Zustand booking state + pricing logic
-│   │   └── userStore.ts          # Zustand auth user state
-│   ├── utils/
-│   │   ├── cn.ts                 # clsx + tailwind-merge helper
-│   │   ├── formatDate.ts         # Date formatter
-│   │   ├── formatPrice.ts        # Currency formatter
-│   │   └── generateQR.ts         # QR code generator
-│   └── validations/
-│       ├── auth.ts               # Login + register Zod schemas
-│       ├── booking.ts            # Booking Zod schema
-│       └── payment.ts            # Payment Zod schema
-│
-├── types/
-│   └── index.ts                  # All shared TypeScript interfaces
-│
-├── tailwind.config.ts
-├── tsconfig.json
-├── next.config.mjs
-└── package.json
+│   │   ├── bookingStore.ts           # Zustand: seats, step, discount, pricing
+│   │   └── userStore.ts              # Zustand: auth user session
+│   ├── validations/
+│   │   ├── auth.ts                   # Zod login + register schemas
+│   │   ├── booking.ts                # Zod booking schema
+│   │   └── payment.ts                # Zod payment schema
+│   └── utils/
+│       ├── cn.ts                     # clsx + tailwind-merge
+│       ├── formatDate.ts
+│       ├── formatPrice.ts
+│       └── generateQR.ts
+└── types/index.ts                    # All shared TypeScript interfaces
 ```
 
 ---
 
-## 🗃️ Data Models
+## Booking Flow
 
 ```
-┌──────────────────┐        ┌──────────────────┐        ┌──────────────────┐
-│      User        │        │      Event        │        │      Venue       │
-├──────────────────┤        ├──────────────────┤        ├──────────────────┤
-│ user_id (PK)     │        │ event_id (PK)    │        │ venue_id (PK)    │
-│ name             │        │ event_name       │        │ venue_name       │
-│ email (UNIQUE)   │        │ event_date       │        │ location         │
-│ phone            │        │ venue_id (FK)    │───────▶│ capacity         │
-│ password (hash)  │        │ category_id (FK) │        └──────────────────┘
-└──────────┬───────┘        │ organizer_id (FK)│
-           │                │ admin_id         │        ┌──────────────────┐
-           │                └────────┬─────────┘        │    Category      │
-           │                         │                  ├──────────────────┤
-           ▼                         │                  │ category_id (PK) │
-┌──────────────────┐                 │                  │ category_name    │
-│     Booking      │                 │                  └──────────────────┘
-├──────────────────┤                 │
-│ booking_id (PK)  │◀────────────────┘
-│ user_id (FK)     │        ┌──────────────────┐
-│ event_id (FK)    │        │      Seat        │
-│ booking_date     │        ├──────────────────┤
-└──────┬───────────┘        │ seat_id (PK)     │
-       │                    │ seat_number      │
-       │   ┌────────────────│ venue_id (FK)    │
-       │   │                │ status           │
-       │   ▼                └──────────────────┘
-       │  ┌──────────────────┐
-       │  │     Ticket       │   UNIQUE(seat_id, event_id)
-       │  ├──────────────────┤   ← double-booking guard
-       │  │ ticket_id (PK)   │
-       │  │ booking_id (FK)  │
-       │  │ seat_id (FK)     │
-       │  │ event_id (FK)    │
-       │  │ qr_code          │
-       │  └──────────────────┘
-       │
-       ▼
-┌──────────────────┐        ┌──────────────────┐
-│     Payment      │        │     Discount     │
-├──────────────────┤        ├──────────────────┤
-│ payment_id (PK)  │        │ discount_id (PK) │
-│ booking_id (FK)  │        │ code (UNIQUE)    │
-│ amount           │        │ percentage       │
-│ payment_method   │        │ expiry_date      │
-│ status           │        └──────────────────┘
-└──────────────────┘
-```
-
----
-
-## 🔌 API Reference
-
-### Authentication
-
-| Method | Endpoint | Body | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/auth/login` | `{ email, password }` | Sign in a user |
-| `POST` | `/api/auth/signup` | `{ name, email, phone, password }` | Register a new user |
-| `GET/POST` | `/api/auth/[...nextauth]` | — | NextAuth.js handler |
-
-### Events
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/events` | List all events with venue, category, organizer and artists |
-| `GET` | `/api/events/:id` | Get full event detail including reviews and seat availability |
-
-### Booking
-
-| Method | Endpoint | Body | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/booking` | `{ user_id, event_id, booking_date }` | Create a booking record |
-| `POST` | `/api/book-ticket` | `{ user_id, event_id, seat_ids, discount_code? }` | Full end-to-end booking |
-| `GET` | `/api/confirmation` | Query `?booking_id=` | Fetch booking confirmation |
-
-### Seats and Discount
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/seats` | Get seat map for a venue |
-| `POST` | `/api/discount` | Validate a discount code |
-| `POST` | `/api/booking-discount` | Link a discount to a booking |
-
-### Payment and Tickets
-
-| Method | Endpoint | Body | Description |
-|--------|----------|------|-------------|
-| `POST` | `/api/payment` | `{ booking_id, amount, payment_method, status }` | Record a payment |
-| `GET` | `/api/ticket` | Query `?booking_id=` | Retrieve tickets with QR codes |
-| `POST` | `/api/review` | `{ user_id, event_id, rating, comment }` | Submit event review |
-| `GET` | `/api/profile` | — | Get authenticated user profile |
-
----
-
-## 🎬 Booking Flow
-
-```
-User visits /events
-      │
-      ▼
-Browse event list ──▶ Click event ──▶ /events/[id]  (event details + seat map)
-                                              │
-                                              ▼
-                                    ┌─────────────────┐
-                                    │  STEP 1: Seats  │
-                                    │  Select seats   │
-                                    │  from row grid  │
-                                    │  (A-E pricing)  │
-                                    └────────┬────────┘
-                                             │ Next
-                                             ▼
-                                    ┌─────────────────┐
-                                    │ STEP 2: Discount│
-                                    │  Enter promo    │
-                                    │  code (optional)│
-                                    │  Live total     │
-                                    │  recalculation  │
-                                    └────────┬────────┘
-                                             │ Next
-                                             ▼
-                                    ┌─────────────────┐
-                                    │ STEP 3: Payment │
-                                    │  Card / NetBank │
-                                    │  OTP verify     │
-                                    │  POST /booking  │
-                                    │  POST /payment  │
-                                    └────────┬────────┘
-                                             │ Success
-                                             ▼
-                                    ┌─────────────────┐
-                                    │  Confirmation   │
-                                    │  3D Ticket card │
-                                    │  QR Code        │
-                                    └─────────────────┘
+/events  →  /events/[id]  →  /booking/[id]  →  /confirmation/[id]
+                                    │
+                          ┌─────────┴──────────┐
+                          │   3-step wizard     │
+                          │                     │
+                          │  Step 1 — Seats     │  fetch /api/seats/[event_id]
+                          │  Live seat map      │  LEFT JOIN Seat + Ticket
+                          │  Spring pop-in      │  booked seats marked in DB
+                          │  Max 6 seats        │
+                          │                     │
+                          │  Step 2 — Review    │  POST /api/discount
+                          │  Order summary      │  validates against Discount table
+                          │  Promo code         │  CURDATE() expiry check
+                          │  Live price calc    │
+                          │                     │
+                          │  Step 3 — Payment   │  POST /api/book-ticket
+                          │  Card / NetBanking  │  BEGIN TRANSACTION
+                          │  OTP verify         │  SELECT ... FOR UPDATE (each seat)
+                          │                     │  INSERT Booking
+                          └─────────────────────┘  INSERT Ticket × n
+                                                   INSERT Payment
+                                                   COMMIT / ROLLBACK
 ```
 
 ### Pricing Formula
 
 ```
-Subtotal     = sum of SEAT_PRICE[row] per selected seat
-               (A = 500  ·  B = 400  ·  C = 300  ·  D = 200  ·  E = 150)
+Row A = ₹500  ·  B = ₹400  ·  C = ₹300  ·  D = ₹200  ·  E = ₹150
 
-ConvFee      = 29 x number_of_seats
-GST          = ConvFee x 18%
-DiscountAmt  = Subtotal x discount.percentage / 100  (if code applied)
-
-Total        = Subtotal - DiscountAmt + ConvFee + GST
+Subtotal    = Σ SEAT_PRICE[row] for each selected seat
+ConvFee     = ₹29 × number of seats
+GST         = ConvFee × 18%
+DiscountAmt = Subtotal × discount.percentage / 100  (if code applied)
+Total       = Subtotal − DiscountAmt + ConvFee + GST
 ```
 
 ---
 
-## 🧠 State Management
+## API Reference
 
-### `useBookingStore` (Zustand)
+### Auth
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/auth/login` | Query `Users` table, compare password |
+| `POST` | `/api/auth/signup` | INSERT into `Users`, check duplicate email |
+
+### Events
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/events` | JOIN Event + Venue + Category + Organizer + Event_Artist |
+| `GET` | `/api/events/[id]` | Single event with full relations |
+
+### Seats & Booking
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/seats/[event_id]` | Live seat status via LEFT JOIN Ticket |
+| `POST` | `/api/book-ticket` | Atomic transaction: Booking + Ticket + Payment |
+| `POST` | `/api/booking` | Standalone Booking INSERT |
+| `GET` | `/api/confirmation/[id]` | 6-table JOIN for full ticket confirmation |
+
+### Discount & Payment
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET/POST` | `/api/discount` | Validate code against Discount table |
+| `POST` | `/api/booking-discount` | INSERT into Booking_Discount |
+| `POST` | `/api/payment` | INSERT into Payment |
+| `GET/POST` | `/api/ticket` | Ticket table read/write |
+
+### Profile
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET/PATCH` | `/api/profile/[user_id]` | Read or update Users table |
+| `GET` | `/api/profile/[user_id]/bookings` | Full booking history with seats + payments |
+| `GET/POST` | `/api/review` | Review table read/write |
+
+---
+
+## State Management
+
+### `useBookingStore` — Zustand
 
 ```ts
-{
-  selectedSeats: Seat[]       // seats chosen on the map
-  currentStep: 1 | 2 | 3     // wizard step
-  appliedDiscount: Discount | null
-  subtotal: number
-  total: number               // auto-recalculated on seat/discount change
-  setSeats(seats)
-  setStep(step)
-  applyDiscount(discount)
-  clearBooking()
-}
+selectedSeats: Seat[]          // seats chosen on the map
+currentStep: 1 | 2 | 3        // wizard step
+appliedDiscount: Discount | null
+subtotal: number               // auto-recalculated on seat/discount change
+total: number                  // includes ConvFee + GST − Discount
+setSeats(seats)
+setStep(step)
+applyDiscount(discount)
+clearBooking()
 ```
 
-### `useUserStore` (Zustand)
+### `useUserStore` — Zustand
 
 ```ts
-{
-  user: User | null
-  isAuthed: boolean
-  setUser(user)
-  clearUser()
-}
+user: User | null
+isAuthed: boolean
+setUser(user)
+clearUser()
 ```
 
 ---
 
-## 🚀 Getting Started
+## Animations
+
+| Location | Technology | Effect |
+|---|---|---|
+| Landing hero | GSAP SplitText | Character-by-character headline reveal |
+| Landing hero | Framer Motion | 3D floating event cards with mouse tracking |
+| Stats section | GSAP ScrollTrigger | Counter animation from 0 to real value |
+| How it works | GSAP horizontal pin | Scroll-driven horizontal step sequence |
+| Features | Framer `whileInView` | Staggered card entrance |
+| Events grid | GSAP stagger | Cards pop in on load and filter change |
+| Events grid | Framer `useSpring` | Per-card 3D tilt on mouse move |
+| Event detail | Framer `useTransform` | Ken Burns parallax banner on scroll |
+| Event detail | GSAP stagger | Section-by-section reveal on mount |
+| Seat map | Framer spring stagger | Each seat button pops in with `delay: index × 8ms` |
+| Seat map | Framer `pathLength` | SVG screen arc draws itself |
+| Booking wizard | Framer `AnimatePresence` | Blur + slide between steps |
+| Booking summary | Framer `popLayout` | Seat rows animate in/out individually |
+| Step indicator | Framer layout | Progress bar fills between steps |
+| Navbar | Framer `useMotionValueEvent` | Height + blur compress on scroll |
+| Login page | GSAP + Framer | Floating event cards, idle sine float |
+| Login success | Framer | Particle ring burst, SVG checkmark draw, route |
+| Register success | Framer | 48-particle confetti, glow expand, progress bar |
+| Confirmation | Three.js | Rotating 3D ticket card with QR code |
+| Profile metrics | GSAP ScrollTrigger | Counters animate from 0 on scroll enter |
+| Page transitions | Framer | 220ms opacity fade on route change |
+
+---
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js >= 18
-- MySQL 8+ (or any mysql2-compatible database)
+- Node.js ≥ 18
+- MariaDB / MySQL 8+
 
 ### Installation
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/lavansh1306/TICKET_BOOKING_SYSTEM.git
-cd TICKET_BOOKING_SYSTEM
-
-# 2. Install dependencies
+cd TICKET_BOOKING_SYSTEM/booking-system
 npm install
-
-# 3. Configure environment variables
 cp .env.example .env.local
-# Edit .env.local with your DB credentials and auth secret
-
-# 4. Start the development server
+# fill in DB credentials
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000)
 
----
-
-## 🔑 Environment Variables
-
-Create a `.env.local` file in the project root:
+### Environment Variables
 
 ```env
-# Database
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
-DB_NAME=ticket_booking
+DB_NAME=ticket_booking_system
 
-# NextAuth
-NEXTAUTH_SECRET=your_super_secret_key
+NEXTAUTH_SECRET=your_secret
 NEXTAUTH_URL=http://localhost:3000
 ```
 
----
-
-## 📜 Scripts
+### Scripts
 
 ```bash
-npm run dev      # Start development server with hot-reload
-npm run build    # Build for production
-npm run start    # Start production server
-npm run lint     # Run ESLint
+npm run dev      # Turbopack dev server
+npm run build    # Production build
+npm run start    # Production server
+npm run lint     # ESLint
 ```
 
 ---
 
-## 🤝 Contributing
+## Known Limitations
 
-1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'feat: add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+- Passwords are stored as plain text — bcrypt migration is noted in the codebase but not yet applied
+- No email delivery — QR codes are generated client-side, no SMTP integration
+- `Seat_Lock` table exists in the DB schema but seat locking uses `SELECT ... FOR UPDATE` inside the booking transaction rather than a separate lock table
 
 ---
 
 <div align="center">
 
-Made with ❤️ by [lavansh1306](https://github.com/lavansh1306)
-
-[![GitHub stars](https://img.shields.io/github/stars/lavansh1306/TICKET_BOOKING_SYSTEM?style=social)](https://github.com/lavansh1306/TICKET_BOOKING_SYSTEM/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/lavansh1306/TICKET_BOOKING_SYSTEM?style=social)](https://github.com/lavansh1306/TICKET_BOOKING_SYSTEM/network/members)
+Made by Lavansh Choubey & Aiyana Sehgal · SRM IST · 21CSC205P
 
 </div>
