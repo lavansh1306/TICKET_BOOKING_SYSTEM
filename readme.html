@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BOOKING_SYSTEM — README</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #050507;
+    --bg2: #0b0b10;
+    --bg3: #111118;
+    --surface: #16161f;
+    --border: rgba(255,255,255,0.06);
+    --border-glow: rgba(120,100,255,0.25);
+    --text: #f0eef8;
+    --muted: #7a788a;
+    --accent: #7c6dfa;
+    --accent2: #c084fc;
+    --accent3: #38bdf8;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --pink: #f472b6;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ===== ANIMATED GRID BG ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,109,250,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,109,250,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== AMBIENT GLOW ===== */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 500px;
+    background: radial-gradient(ellipse, rgba(124,109,250,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== LAYOUT ===== */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    padding: 100px 0 80px;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border-glow);
+    background: rgba(124,109,250,0.08);
+    padding: 6px 16px;
+    border-radius: 100px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+    animation: fadeSlideUp 0.6s ease both;
+  }
+
+  .hero-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(52px, 8vw, 88px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 20px;
+    animation: fadeSlideUp 0.6s 0.1s ease both;
+  }
+
+  .hero h1 .grad {
+    background: linear-gradient(135deg, #a78bfa 0%, #7c6dfa 40%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-tagline {
+    font-size: 18px;
+    color: var(--muted);
+    font-weight: 300;
+    max-width: 540px;
+    margin: 0 auto 40px;
+    animation: fadeSlideUp 0.6s 0.2s ease both;
+  }
+
+  .hero-tagline strong {
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* ===== TECH BADGES ===== */
+  .badges-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 20px;
+    animation: fadeSlideUp 0.6s 0.3s ease both;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+
+  .badge:hover {
+    transform: translateY(-2px);
+  }
+
+  .badge .b-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  .b-next { background: rgba(0,0,0,0.6); border-color: rgba(255,255,255,0.12); color: #fff; }
+  .b-next:hover { box-shadow: 0 4px 20px rgba(255,255,255,0.08); }
+
+  .b-ts { background: rgba(49,120,198,0.12); border-color: rgba(49,120,198,0.35); color: #60a5fa; }
+  .b-ts:hover { box-shadow: 0 4px 20px rgba(49,120,198,0.2); }
+
+  .b-tw { background: rgba(56,189,248,0.08); border-color: rgba(56,189,248,0.3); color: #38bdf8; }
+  .b-tw:hover { box-shadow: 0 4px 20px rgba(56,189,248,0.15); }
+
+  .b-maria { background: rgba(249,115,22,0.1); border-color: rgba(249,115,22,0.3); color: #fb923c; }
+  .b-maria:hover { box-shadow: 0 4px 20px rgba(249,115,22,0.15); }
+
+  .b-framer { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.25); color: #22d3ee; }
+  .b-framer:hover { box-shadow: 0 4px 20px rgba(0,212,255,0.12); }
+
+  .b-gsap { background: rgba(136,211,83,0.08); border-color: rgba(136,211,83,0.3); color: #86efac; }
+  .b-gsap:hover { box-shadow: 0 4px 20px rgba(136,211,83,0.12); }
+
+  .b-three { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); color: #d1d5db; }
+  .b-three:hover { box-shadow: 0 4px 20px rgba(255,255,255,0.06); }
+
+  .b-zustand { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.3); color: #fbbf24; }
+  .b-zustand:hover { box-shadow: 0 4px 20px rgba(251,191,36,0.12); }
+
+  .b-auth { background: rgba(192,132,252,0.08); border-color: rgba(192,132,252,0.3); color: #c084fc; }
+  .b-auth:hover { box-shadow: 0 4px 20px rgba(192,132,252,0.12); }
+
+  .b-zod { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.3); color: #34d399; }
+  .b-zod:hover { box-shadow: 0 4px 20px rgba(52,211,153,0.12); }
+
+  .b-tanstack { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3); color: #f87171; }
+  .b-tanstack:hover { box-shadow: 0 4px 20px rgba(239,68,68,0.12); }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+    margin: 60px 0;
+  }
+
+  /* ===== SECTION ===== */
+  .section { margin-bottom: 72px; }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 32px;
+    font-weight: 300;
+  }
+
+  /* ===== OVERVIEW CARD ===== */
+  .overview-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .overview-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .overview-card p {
+    color: #c0bdd4;
+    line-height: 1.8;
+    font-size: 15.5px;
+  }
+
+  .overview-card p strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ===== TECH STACK TABLE ===== */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+  }
+
+  .stack-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .stack-item:hover {
+    border-color: rgba(124,109,250,0.3);
+    transform: translateX(2px);
+  }
+
+  .stack-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .stack-info { flex: 1; min-width: 0; }
+
+  .stack-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stack-layer {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+
+  .stack-version {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(124,109,250,0.1);
+    padding: 2px 8px;
+    border-radius: 100px;
+    flex-shrink: 0;
+  }
+
+  /* ===== DB SCHEMA ===== */
+  .schema-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .schema-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    transition: border-color 0.2s;
+  }
+
+  .schema-table:hover { border-color: rgba(56,189,248,0.3); }
+
+  .schema-table-name {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent3);
+    margin-bottom: 4px;
+  }
+
+  .schema-table-fields {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    line-height: 1.6;
+  }
+
+  .schema-special {
+    background: rgba(124,109,250,0.06);
+    border-color: rgba(124,109,250,0.2);
+  }
+
+  .schema-special .schema-table-name { color: var(--accent); }
+
+  /* ===== BOOKING FLOW ===== */
+  .flow-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .flow-url-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .flow-url-bar::-webkit-scrollbar { height: 3px; }
+  .flow-url-bar::-webkit-scrollbar-track { background: transparent; }
+  .flow-url-bar::-webkit-scrollbar-thumb { background: var(--border-glow); border-radius: 2px; }
+
+  .flow-page {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent3);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .flow-arrow {
+    color: var(--muted);
+    padding: 0 6px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .flow-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .flow-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .flow-step::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .flow-step:nth-child(1)::before { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .flow-step:nth-child(2)::before { background: linear-gradient(90deg, var(--accent2), var(--pink)); }
+  .flow-step:nth-child(3)::before { background: linear-gradient(90deg, var(--pink), var(--accent3)); }
+
+  .flow-step-num {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  .flow-step-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .flow-step-detail {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    line-height: 1.7;
+  }
+
+  /* ===== PRICING ===== */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .price-row {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .price-row:hover { transform: translateY(-3px); border-color: rgba(124,109,250,0.3); }
+
+  .price-row-label {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .price-row-amount {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .price-row-desc { font-size: 11px; color: var(--muted); }
+
+  .pricing-formula {
+    background: rgba(124,109,250,0.05);
+    border: 1px solid rgba(124,109,250,0.15);
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 2;
+  }
+
+  .pricing-formula .formula-line {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+  }
+
+  .formula-key { color: var(--accent); min-width: 120px; font-weight: 500; }
+  .formula-val { color: #c0bdd4; }
+  .formula-val em { color: var(--green); font-style: normal; }
+
+  /* ===== CODE BLOCK ===== */
+  .code-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .code-dot-r { background: #ff5f57; }
+  .code-dot-y { background: #ffbd2e; }
+  .code-dot-g { background: #28ca41; }
+
+  .code-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+
+  .code-body {
+    padding: 20px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.8;
+    overflow-x: auto;
+    white-space: pre;
+    color: #c0bdd4;
+  }
+
+  .kw { color: #c084fc; }
+  .str { color: #86efac; }
+  .comment { color: #444454; }
+  .fn { color: #60a5fa; }
+  .num { color: #fbbf24; }
+
+  /* ===== API TABLE ===== */
+  .api-section { margin-bottom: 28px; }
+
+  .api-section-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .api-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .api-row:first-of-type { border-top: 1px solid var(--border); border-radius: 10px 10px 0 0; }
+  .api-row:last-of-type { border-radius: 0 0 10px 10px; }
+  .api-row:hover { background: rgba(255,255,255,0.02); }
+
+  .method {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 5px;
+    min-width: 50px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .m-get { background: rgba(52,211,153,0.1); color: #34d399; }
+  .m-post { background: rgba(251,191,36,0.1); color: #fbbf24; }
+  .m-patch { background: rgba(56,189,248,0.1); color: #38bdf8; }
+  .m-gp { background: rgba(192,132,252,0.1); color: #c084fc; }
+
+  .api-path {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent3);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .api-desc {
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  .anim-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 6px;
+  }
+
+  .anim-table tr td {
+    padding: 10px 14px;
+    background: var(--surface);
+    font-size: 13px;
+  }
+
+  .anim-table tr td:first-child {
+    border-radius: 8px 0 0 8px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    width: 160px;
+  }
+
+  .anim-table tr td:nth-child(2) {
+    color: var(--accent);
+    width: 120px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .anim-table tr td:last-child {
+    border-radius: 0 8px 8px 0;
+    color: #c0bdd4;
+  }
+
+  /* ===== KNOWN ISSUES ===== */
+  .issue-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .issue-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 16px;
+    background: rgba(239,68,68,0.04);
+    border: 1px solid rgba(239,68,68,0.12);
+    border-radius: 10px;
+    font-size: 13.5px;
+    color: #c0bdd4;
+  }
+
+  .issue-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ===== SETUP STEPS ===== */
+  .setup-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .setup-steps::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 24px;
+    bottom: 24px;
+    width: 1px;
+    background: var(--border);
+  }
+
+  .setup-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 12px 0;
+  }
+
+  .setup-num {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .setup-content { padding-top: 5px; }
+
+  .setup-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .setup-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ===== ENV VARS ===== */
+  .env-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 8px;
+  }
+
+  .env-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .env-key {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--amber);
+  }
+
+  .env-val {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center;
+    padding: 60px 0 80px;
+    position: relative;
+  }
+
+  .footer::before {
+    content: '';
+    display: block;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+    margin-bottom: 48px;
+  }
+
+  .footer-names {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+
+  .footer-college {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+
+  .footer-heart {
+    font-size: 14px;
+    margin: 0 6px;
+    color: var(--pink);
+  }
+
+  /* ===== SCROLL ANIMATIONS ===== */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(124,109,250,0.3); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* ===== HIGHLIGHT ===== */
+  .hl { color: var(--accent); }
+  .hl-g { color: var(--green); }
+  .hl-a { color: var(--amber); }
+  .hl-b { color: var(--accent3); }
+
+  @media (max-width: 640px) {
+    .flow-steps { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: repeat(3, 1fr); }
+    .api-desc { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<div class="container">
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      DBMS Course Project · SRM IST · 21CSC205P
+    </div>
+
+    <h1>
+      <span class="grad">BOOKING</span><br>SYSTEM
+    </h1>
+
+    <p class="hero-tagline">
+      A <strong>production-grade full-stack</strong> event ticketing platform — from seat discovery to QR ticket generation, backed by live MariaDB.
+    </p>
+
+    <div class="badges-row">
+      <span class="badge b-next"><span class="b-icon">▲</span> Next.js 16</span>
+      <span class="badge b-ts"><span class="b-icon" style="font-family:monospace;font-weight:700">TS</span> TypeScript 5</span>
+      <span class="badge b-tw"><span class="b-icon">≈</span> Tailwind 3.4</span>
+      <span class="badge b-maria"><span class="b-icon">◉</span> MariaDB</span>
+      <span class="badge b-framer"><span class="b-icon">✦</span> Framer Motion 12</span>
+      <span class="badge b-gsap"><span class="b-icon">▶</span> GSAP 3.15</span>
+      <span class="badge b-three"><span class="b-icon">◈</span> Three.js 0.184</span>
+      <span class="badge b-zustand"><span class="b-icon">⊕</span> Zustand 5</span>
+      <span class="badge b-tanstack"><span class="b-icon">◇</span> TanStack Query 5</span>
+      <span class="badge b-auth"><span class="b-icon">⬡</span> NextAuth v5</span>
+      <span class="badge b-zod"><span class="b-icon">✓</span> Zod 4</span>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== OVERVIEW ===== -->
+  <section class="section reveal">
+    <div class="section-label">Overview</div>
+    <h2 class="section-title">What is this?</h2>
+    <div class="overview-card">
+      <p>
+        BOOKING_SYSTEM covers the <strong>complete booking lifecycle</strong> — event discovery, interactive seat selection, discount validation, payment processing, and QR ticket generation — backed by a real relational MariaDB database with proper <strong>transaction handling and concurrency control</strong>.
+        <br><br>
+        Every API route reads from and writes to the live database. <strong>No mock data</strong> is served in production paths. Double-booking protection is enforced at the database level via <code style="background:rgba(124,109,250,0.12);color:var(--accent);padding:2px 6px;border-radius:4px;font-size:13px">SELECT ... FOR UPDATE</code> inside atomic transactions.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== TECH STACK ===== -->
+  <section class="section reveal">
+    <div class="section-label">Stack</div>
+    <h2 class="section-title">Technology Stack</h2>
+    <p class="section-desc">18 libraries, zero compromises.</p>
+    <div class="stack-grid">
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1)">▲</div>
+        <div class="stack-info">
+          <div class="stack-name">Next.js App Router</div>
+          <div class="stack-layer">Framework</div>
+        </div>
+        <span class="stack-version">16.2.4</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(49,120,198,0.12)">TS</div>
+        <div class="stack-info">
+          <div class="stack-name">TypeScript</div>
+          <div class="stack-layer">Language</div>
+        </div>
+        <span class="stack-version">5</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(56,189,248,0.1)">≈</div>
+        <div class="stack-info">
+          <div class="stack-name">Tailwind CSS</div>
+          <div class="stack-layer">Styling</div>
+        </div>
+        <span class="stack-version">3.4</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(0,212,255,0.1)">✦</div>
+        <div class="stack-info">
+          <div class="stack-name">Framer Motion</div>
+          <div class="stack-layer">Animation</div>
+        </div>
+        <span class="stack-version">12.38</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(136,211,83,0.1)">▶</div>
+        <div class="stack-info">
+          <div class="stack-name">GSAP + SplitText</div>
+          <div class="stack-layer">Animation</div>
+        </div>
+        <span class="stack-version">3.15</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(255,255,255,0.04)">◈</div>
+        <div class="stack-info">
+          <div class="stack-name">Three.js</div>
+          <div class="stack-layer">3D</div>
+        </div>
+        <span class="stack-version">0.184</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(251,191,36,0.1)">⊕</div>
+        <div class="stack-info">
+          <div class="stack-name">Zustand</div>
+          <div class="stack-layer">State</div>
+        </div>
+        <span class="stack-version">5</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(239,68,68,0.1)">◇</div>
+        <div class="stack-info">
+          <div class="stack-name">TanStack Query</div>
+          <div class="stack-layer">Server State</div>
+        </div>
+        <span class="stack-version">5</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(192,132,252,0.1)">⬡</div>
+        <div class="stack-info">
+          <div class="stack-name">NextAuth.js</div>
+          <div class="stack-layer">Auth</div>
+        </div>
+        <span class="stack-version">v5 beta</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(52,211,153,0.1)">✓</div>
+        <div class="stack-info">
+          <div class="stack-name">React Hook Form + Zod</div>
+          <div class="stack-layer">Forms</div>
+        </div>
+        <span class="stack-version">7 + 4</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(249,115,22,0.1)">◉</div>
+        <div class="stack-info">
+          <div class="stack-name">MariaDB / mysql2</div>
+          <div class="stack-layer">Database</div>
+        </div>
+        <span class="stack-version">3.22</span>
+      </div>
+      <div class="stack-item">
+        <div class="stack-icon" style="background:rgba(124,109,250,0.1)">⚿</div>
+        <div class="stack-info">
+          <div class="stack-name">bcrypt</div>
+          <div class="stack-layer">Password</div>
+        </div>
+        <span class="stack-version">6</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== DATABASE ===== -->
+  <section class="section reveal">
+    <div class="section-label">Data Layer</div>
+    <h2 class="section-title">Database Schema</h2>
+    <p class="section-desc">18 tables in MariaDB. All API routes query these directly.</p>
+    <div class="schema-grid">
+      <div class="schema-table">
+        <div class="schema-table-name">Users</div>
+        <div class="schema-table-fields">user_id · name · email<br>phone · password</div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Event</div>
+        <div class="schema-table-fields">event_id · event_name<br>event_date · venue_id<br>category_id · organizer_id</div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Venue</div>
+        <div class="schema-table-fields">venue_id · venue_name<br>location · capacity</div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Seat</div>
+        <div class="schema-table-fields">seat_id · seat_number<br>venue_id</div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Booking</div>
+        <div class="schema-table-fields">booking_id · user_id<br>event_id · booking_date</div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Ticket</div>
+        <div class="schema-table-fields">ticket_id · booking_id<br>seat_id · event_id · qr_code</div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Payment</div>
+        <div class="schema-table-fields">payment_id · booking_id<br>amount · method · status</div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Discount</div>
+        <div class="schema-table-fields">discount_id · code<br>percentage · expiry_date</div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Review</div>
+        <div class="schema-table-fields">review_id · user_id<br>event_id · rating · comment</div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Artist</div>
+        <div class="schema-table-fields">artist_id · artist_name<br>genre</div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Event_Artist</div>
+        <div class="schema-table-fields">event_id · artist_id<br><em style="color:var(--accent);font-style:normal;font-size:10px">— junction table</em></div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-table-name">Booking_Discount</div>
+        <div class="schema-table-fields">booking_id · discount_id<br><em style="color:var(--accent);font-style:normal;font-size:10px">— junction table</em></div>
+      </div>
+      <div class="schema-table schema-special">
+        <div class="schema-table-name">Seat_Lock</div>
+        <div class="schema-table-fields">concurrency seat locking</div>
+      </div>
+      <div class="schema-table schema-special">
+        <div class="schema-table-name">Booking_View</div>
+        <div class="schema-table-fields">DB view — booking summaries</div>
+      </div>
+      <div class="schema-table schema-special">
+        <div class="schema-table-name">Revenue_View</div>
+        <div class="schema-table-fields">DB view — revenue reporting</div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dot code-dot-r"></div>
+        <div class="code-dot code-dot-y"></div>
+        <div class="code-dot code-dot-g"></div>
+        <span class="code-title">Double-booking protection — /api/book-ticket</span>
+      </div>
+      <div class="code-body"><span class="comment">-- Runs inside BEGIN ... COMMIT/ROLLBACK</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Seat
+  <span class="kw">WHERE</span> seat_id <span class="kw">IN</span> (?, ?, ...)
+  <span class="kw">FOR UPDATE</span>;          <span class="comment">-- locks each row</span>
+
+<span class="kw">INSERT INTO</span> Booking ...;
+<span class="kw">INSERT INTO</span> Ticket  ...;  <span class="comment">-- × n seats</span>
+<span class="kw">INSERT INTO</span> Payment ...;
+
+<span class="comment">-- ROLLBACK if any seat already taken</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== BOOKING FLOW ===== -->
+  <section class="section reveal">
+    <div class="section-label">User Journey</div>
+    <h2 class="section-title">Booking Flow</h2>
+    <p class="section-desc">Three-step wizard from seat selection to confirmation.</p>
+
+    <div class="flow-url-bar">
+      <div class="flow-page">/events</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-page">/events/[id]</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-page">/booking/[id]</div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-page">/confirmation/[id]</div>
+    </div>
+
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-step-num">STEP 01</div>
+        <div class="flow-step-title">Seat Selection</div>
+        <div class="flow-step-detail">
+          Live seat map via<br>
+          <span class="hl">GET /api/seats/[id]</span><br>
+          LEFT JOIN Seat + Ticket<br>
+          Booked = blocked in DB<br>
+          Max 6 seats per booking
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">STEP 02</div>
+        <div class="flow-step-title">Review & Discount</div>
+        <div class="flow-step-detail">
+          Order summary<br>
+          Promo code validation<br>
+          <span class="hl">POST /api/discount</span><br>
+          CURDATE() expiry check<br>
+          Live total recalculation
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-num">STEP 03</div>
+        <div class="flow-step-title">Payment & Confirm</div>
+        <div class="flow-step-detail">
+          <span class="hl">POST /api/book-ticket</span><br>
+          BEGIN TRANSACTION<br>
+          SELECT … FOR UPDATE<br>
+          INSERT × 3 tables<br>
+          COMMIT / ROLLBACK
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section class="section reveal">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Pricing Formula</h2>
+
+    <div class="pricing-grid">
+      <div class="price-row">
+        <div class="price-row-label">A</div>
+        <div class="price-row-amount">₹500</div>
+        <div class="price-row-desc">Front row</div>
+      </div>
+      <div class="price-row">
+        <div class="price-row-label">B</div>
+        <div class="price-row-amount">₹400</div>
+        <div class="price-row-desc">Row B</div>
+      </div>
+      <div class="price-row">
+        <div class="price-row-label">C</div>
+        <div class="price-row-amount">₹300</div>
+        <div class="price-row-desc">Row C</div>
+      </div>
+      <div class="price-row">
+        <div class="price-row-label">D</div>
+        <div class="price-row-amount">₹200</div>
+        <div class="price-row-desc">Row D</div>
+      </div>
+      <div class="price-row">
+        <div class="price-row-label">E</div>
+        <div class="price-row-amount">₹150</div>
+        <div class="price-row-desc">Row E</div>
+      </div>
+    </div>
+
+    <div class="pricing-formula">
+      <div class="formula-line"><span class="formula-key">Subtotal</span><span class="formula-val">= Σ SEAT_PRICE[row]</span></div>
+      <div class="formula-line"><span class="formula-key">Conv. Fee</span><span class="formula-val">= <em>₹29</em> × seats</span></div>
+      <div class="formula-line"><span class="formula-key">GST</span><span class="formula-val">= ConvFee × <em>18%</em></span></div>
+      <div class="formula-line"><span class="formula-key">Discount</span><span class="formula-val">= Subtotal × code.pct / 100</span></div>
+      <div class="formula-line"><span class="formula-key" style="color:var(--green)">Total</span><span class="formula-val">= Subtotal − Discount + ConvFee + GST</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== API REFERENCE ===== -->
+  <section class="section reveal">
+    <div class="section-label">API</div>
+    <h2 class="section-title">API Reference</h2>
+
+    <div class="api-section">
+      <div class="api-section-title">Auth</div>
+      <div class="api-row"><span class="method m-post">POST</span><span class="api-path">/api/auth/login</span><span class="api-desc">Query Users, compare password</span></div>
+      <div class="api-row"><span class="method m-post">POST</span><span class="api-path">/api/auth/signup</span><span class="api-desc">INSERT Users, duplicate check</span></div>
+    </div>
+
+    <div class="api-section">
+      <div class="api-section-title">Events</div>
+      <div class="api-row"><span class="method m-get">GET</span><span class="api-path">/api/events</span><span class="api-desc">JOIN Event + Venue + Category + Organizer</span></div>
+      <div class="api-row"><span class="method m-get">GET</span><span class="api-path">/api/events/[id]</span><span class="api-desc">Single event with full relations</span></div>
+    </div>
+
+    <div class="api-section">
+      <div class="api-section-title">Seats & Booking</div>
+      <div class="api-row"><span class="method m-get">GET</span><span class="api-path">/api/seats/[event_id]</span><span class="api-desc">Live seat status via LEFT JOIN Ticket</span></div>
+      <div class="api-row"><span class="method m-post">POST</span><span class="api-path">/api/book-ticket</span><span class="api-desc">Atomic transaction: Booking + Ticket + Payment</span></div>
+      <div class="api-row"><span class="method m-post">POST</span><span class="api-path">/api/booking</span><span class="api-desc">Standalone Booking INSERT</span></div>
+      <div class="api-row"><span class="method m-get">GET</span><span class="api-path">/api/confirmation/[id]</span><span class="api-desc">6-table JOIN for full ticket confirmation</span></div>
+    </div>
+
+    <div class="api-section">
+      <div class="api-section-title">Discount & Payment</div>
+      <div class="api-row"><span class="method m-gp">GET/POST</span><span class="api-path">/api/discount</span><span class="api-desc">Validate code against Discount table</span></div>
+      <div class="api-row"><span class="method m-post">POST</span><span class="api-path">/api/booking-discount</span><span class="api-desc">INSERT into Booking_Discount</span></div>
+      <div class="api-row"><span class="method m-post">POST</span><span class="api-path">/api/payment</span><span class="api-desc">INSERT into Payment</span></div>
+      <div class="api-row"><span class="method m-gp">GET/POST</span><span class="api-path">/api/ticket</span><span class="api-desc">Ticket table read/write</span></div>
+    </div>
+
+    <div class="api-section">
+      <div class="api-section-title">Profile</div>
+      <div class="api-row"><span class="method m-patch">GET/PATCH</span><span class="api-path">/api/profile/[user_id]</span><span class="api-desc">Read or update Users table</span></div>
+      <div class="api-row"><span class="method m-get">GET</span><span class="api-path">/api/profile/[user_id]/bookings</span><span class="api-desc">Full booking history with seats + payments</span></div>
+      <div class="api-row"><span class="method m-gp">GET/POST</span><span class="api-path">/api/review</span><span class="api-desc">Review table read/write</span></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== STATE ===== -->
+  <section class="section reveal">
+    <div class="section-label">State</div>
+    <h2 class="section-title">State Management</h2>
+    <p class="section-desc">Two Zustand stores — booking wizard and auth session.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dot code-dot-r"></div>
+            <div class="code-dot code-dot-y"></div>
+            <div class="code-dot code-dot-g"></div>
+            <span class="code-title">useBookingStore.ts</span>
+          </div>
+          <div class="code-body"><span class="kw">type</span> BookingStore = {
+  selectedSeats: <span class="str">Seat[]</span>
+  currentStep:   <span class="num">1</span> | <span class="num">2</span> | <span class="num">3</span>
+  appliedDiscount: <span class="str">Discount</span> | <span class="kw">null</span>
+  subtotal:      <span class="str">number</span>
+  total:         <span class="str">number</span>
+  setSeats:      <span class="fn">(s)</span> => <span class="kw">void</span>
+  setStep:       <span class="fn">(s)</span> => <span class="kw">void</span>
+  applyDiscount: <span class="fn">(d)</span> => <span class="kw">void</span>
+  clearBooking:  <span class="fn">()</span>  => <span class="kw">void</span>
+}</div>
+        </div>
+      </div>
+      <div>
+        <div class="code-block">
+          <div class="code-header">
+            <div class="code-dot code-dot-r"></div>
+            <div class="code-dot code-dot-y"></div>
+            <div class="code-dot code-dot-g"></div>
+            <span class="code-title">useUserStore.ts</span>
+          </div>
+          <div class="code-body"><span class="kw">type</span> UserStore = {
+  user:     <span class="str">User</span> | <span class="kw">null</span>
+  isAuthed: <span class="str">boolean</span>
+  setUser:  <span class="fn">(u)</span> => <span class="kw">void</span>
+  clearUser:<span class="fn">()</span>  => <span class="kw">void</span>
+}
+
+<span class="comment">// persisted across routes</span>
+<span class="comment">// cleared on logout</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ANIMATIONS TABLE ===== -->
+  <section class="section reveal">
+    <div class="section-label">Motion</div>
+    <h2 class="section-title">Animation Inventory</h2>
+    <p class="section-desc">Every motion effect, catalogued.</p>
+
+    <table class="anim-table">
+      <tr><td>Landing hero</td><td>GSAP SplitText</td><td>Character-by-character headline reveal</td></tr>
+      <tr><td>Landing hero</td><td>Framer Motion</td><td>3D floating event cards with mouse tracking</td></tr>
+      <tr><td>Stats section</td><td>GSAP ScrollTrigger</td><td>Counter from 0 to real value on scroll enter</td></tr>
+      <tr><td>How it works</td><td>GSAP horizontal pin</td><td>Scroll-driven horizontal step sequence</td></tr>
+      <tr><td>Events grid</td><td>GSAP stagger</td><td>Cards pop in on load and filter change</td></tr>
+      <tr><td>Events grid</td><td>Framer useSpring</td><td>Per-card 3D tilt on mouse move</td></tr>
+      <tr><td>Event detail</td><td>Framer useTransform</td><td>Ken Burns parallax banner on scroll</td></tr>
+      <tr><td>Seat map</td><td>Framer spring stagger</td><td>Each seat button pops in with delay: i × 8ms</td></tr>
+      <tr><td>Seat map</td><td>Framer pathLength</td><td>SVG screen arc draws itself on mount</td></tr>
+      <tr><td>Booking wizard</td><td>Framer AnimatePresence</td><td>Blur + slide transition between steps</td></tr>
+      <tr><td>Booking summary</td><td>Framer popLayout</td><td>Seat rows animate in/out individually</td></tr>
+      <tr><td>Step indicator</td><td>Framer layout</td><td>Progress bar fills smoothly between steps</td></tr>
+      <tr><td>Navbar</td><td>Framer motionValueEvent</td><td>Height + blur compress on scroll down</td></tr>
+      <tr><td>Login</td><td>GSAP + Framer</td><td>Floating event cards, idle sine float</td></tr>
+      <tr><td>Login success</td><td>Framer</td><td>Particle ring burst, SVG checkmark draw</td></tr>
+      <tr><td>Register success</td><td>Framer</td><td>48-particle confetti, glow expand, progress bar</td></tr>
+      <tr><td>Confirmation</td><td>Three.js</td><td>Rotating 3D ticket card with QR texture</td></tr>
+      <tr><td>Profile metrics</td><td>GSAP ScrollTrigger</td><td>Counters animate from 0 on scroll enter</td></tr>
+      <tr><td>Page transitions</td><td>Framer</td><td>220ms opacity fade on route change</td></tr>
+    </table>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== GETTING STARTED ===== -->
+  <section class="section reveal">
+    <div class="section-label">Setup</div>
+    <h2 class="section-title">Getting Started</h2>
+
+    <div class="setup-steps">
+      <div class="setup-step">
+        <div class="setup-num">1</div>
+        <div class="setup-content">
+          <div class="setup-label">Clone the repository</div>
+          <div class="setup-sub">git clone https://github.com/lavansh1306/TICKET_BOOKING_SYSTEM.git</div>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">2</div>
+        <div class="setup-content">
+          <div class="setup-label">Install dependencies</div>
+          <div class="setup-sub">cd booking-system && npm install</div>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">3</div>
+        <div class="setup-content">
+          <div class="setup-label">Configure environment</div>
+          <div class="setup-sub">cp .env.example .env.local — then fill in DB credentials below</div>
+        </div>
+      </div>
+      <div class="setup-step">
+        <div class="setup-num">4</div>
+        <div class="setup-content">
+          <div class="setup-label">Start dev server</div>
+          <div class="setup-sub">npm run dev → http://localhost:3000</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:28px">
+      <div class="section-label" style="margin-bottom:16px">Environment Variables</div>
+      <div class="env-grid">
+        <div class="env-item"><span class="env-key">DB_HOST</span><span class="env-val">localhost</span></div>
+        <div class="env-item"><span class="env-key">DB_PORT</span><span class="env-val">3306</span></div>
+        <div class="env-item"><span class="env-key">DB_USER</span><span class="env-val">root</span></div>
+        <div class="env-item"><span class="env-key">DB_PASSWORD</span><span class="env-val">your_password</span></div>
+        <div class="env-item"><span class="env-key">DB_NAME</span><span class="env-val">ticket_booking_system</span></div>
+        <div class="env-item"><span class="env-key">NEXTAUTH_SECRET</span><span class="env-val">your_secret</span></div>
+        <div class="env-item"><span class="env-key">NEXTAUTH_URL</span><span class="env-val">http://localhost:3000</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:28px">
+      <div class="section-label" style="margin-bottom:16px">Scripts</div>
+      <div class="code-block">
+        <div class="code-header">
+          <div class="code-dot code-dot-r"></div>
+          <div class="code-dot code-dot-y"></div>
+          <div class="code-dot code-dot-g"></div>
+          <span class="code-title">package.json scripts</span>
+        </div>
+        <div class="code-body"><span class="fn">npm run dev</span>    <span class="comment"># Turbopack dev server</span>
+<span class="fn">npm run build</span>  <span class="comment"># Production build</span>
+<span class="fn">npm run start</span>  <span class="comment"># Production server</span>
+<span class="fn">npm run lint</span>   <span class="comment"># ESLint</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== KNOWN LIMITATIONS ===== -->
+  <section class="section reveal">
+    <div class="section-label">Limitations</div>
+    <h2 class="section-title">Known Limitations</h2>
+
+    <div class="issue-list">
+      <div class="issue-item">
+        <span class="issue-icon" style="color:var(--amber)">⚠</span>
+        <span>Passwords are stored as <strong>plain text</strong> — bcrypt migration is noted in the codebase but not yet applied.</span>
+      </div>
+      <div class="issue-item">
+        <span class="issue-icon" style="color:var(--muted)">✉</span>
+        <span><strong>No email delivery</strong> — QR codes are generated client-side. No SMTP integration exists yet.</span>
+      </div>
+      <div class="issue-item">
+        <span class="issue-icon" style="color:var(--accent3)">⊙</span>
+        <span>The <code style="background:rgba(56,189,248,0.1);color:var(--accent3);padding:1px 6px;border-radius:4px;font-size:12px">Seat_Lock</code> table exists in the schema but seat locking uses <code style="background:rgba(56,189,248,0.1);color:var(--accent3);padding:1px 6px;border-radius:4px;font-size:12px">SELECT … FOR UPDATE</code> inside the booking transaction rather than the lock table.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer reveal">
+    <div class="footer-names">
+      Lavansh Choubey <span class="footer-heart">♥</span> Aiyana Sehgal
+    </div>
+    <div class="footer-college">
+      SRM INSTITUTE OF SCIENCE AND TECHNOLOGY · 21CSC205P · DBMS PROJECT
+    </div>
+  </footer>
+</div>
+
+<script>
+const reveals = document.querySelectorAll('.reveal');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 60);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+reveals.forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

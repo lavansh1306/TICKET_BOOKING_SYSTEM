@@ -3,6 +3,8 @@ export interface User {
   name: string;
   email: string;
   phone: string;
+  role?: "user" | "admin";
+  admin_id?: number;
   password?: string;
 }
 
