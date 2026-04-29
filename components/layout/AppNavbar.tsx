@@ -41,6 +41,7 @@ export default function AppNavbar() {
   }
 
   const navLinks = [
+    ...(user?.role === "admin" ? [{ label: "Admin Panel", href: "/admin" }] : []),
     { label: "My Profile", href: "/profile" },
     { label: "My Bookings", href: "/profile/bookings" },
     { label: "My Reviews", href: "/profile/reviews" },

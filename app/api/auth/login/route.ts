@@ -12,6 +12,11 @@ interface UserRow extends RowDataPacket {
   password: string;
 }
 
+interface AdminRow extends RowDataPacket {
+  admin_id: number;
+  email: string;
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -53,6 +58,13 @@ export async function POST(request: Request) {
       );
     }
 
+    const [adminRows] = await db.query<AdminRow[]>(
+      "SELECT admin_id, email FROM `Admin` WHERE email = ? LIMIT 1",
+      [email.toLowerCase()],
+    );
+
+    const matchedAdmin = adminRows[0] ?? null;
+
     return NextResponse.json(
       {
         data: {
@@ -60,6 +72,8 @@ export async function POST(request: Request) {
           name: user.name,
           email: user.email,
           phone: user.phone,
+          role: matchedAdmin ? "admin" : "user",
+          admin_id: matchedAdmin?.admin_id,
         },
         session: true,
       },

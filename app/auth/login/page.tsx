@@ -176,7 +176,13 @@ export default function LoginPage() {
       if (!res.ok) { setError(json.error ?? "Invalid credentials"); return; }
       setUser(json.data);
       setSuccess({ name: json.data.name });
-      setTimeout(() => router.push(params.get("returnUrl") ?? "/events"), 2200);
+      setTimeout(() => {
+        if (json.data.role === "admin") {
+          router.push("/admin");
+          return;
+        }
+        router.push(params.get("returnUrl") ?? "/events");
+      }, 2200);
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -330,6 +336,20 @@ export default function LoginPage() {
               >
                 Register →
               </motion.button>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.72 }}
+              className="mt-3"
+            >
+              <button
+                onClick={() => router.push("/auth/admin")}
+                className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)] hover:underline"
+              >
+                Admin login →
+              </button>
             </motion.div>
           </div>
         </div>
